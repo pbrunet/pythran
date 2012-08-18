@@ -190,6 +190,9 @@ modules = {
         "__set__" : {
             "add" : MethodIntr([lambda self, node: self.combine(node.args[0], node.args[1], unary_op=lambda f: cxxtypes.SetType(f), register=True)]),
             },
+        "__exception__" : {
+            "args": AttributeIntr(0),
+            },
         "_complex_" : {
                 "real": AttributeIntr(0),
                 "imag": AttributeIntr(1),

@@ -51,10 +51,10 @@ class SyntaxChecker(ast.NodeVisitor):
         if node.tback: raise PythranSyntaxError("Traceback in raise statements are not supported")
 
     def visit_TryExcept(self, node):
-        raise PythranSyntaxError("Try blocks are not supported", node)
+        if node.orelse: raise PythranSyntaxError("Else statement of try blocks are not supported", node)
 
     def visit_TryFinally(self, node):
-        raise PythranSyntaxError("Try blocks are not supported", node)
+        raise PythranSyntaxError("Try blocks with finally statement are not supported", node)
 
     def visit_Import(self, node):
         for alias in node.names:

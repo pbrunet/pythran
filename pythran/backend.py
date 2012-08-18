@@ -301,6 +301,12 @@ class CxxBackend(ast.NodeVisitor):
         self.break_handler.pop()
         return While(test, Block(body))
 
+    def visit_TryExcept(self, node):
+        body = [ self.visit(n) for n in node.body ]
+        except_ = [ (n.type.id if n.type else None,Block([ self.visit(m) for m in n.body ])) for n in node.handlers ]
+        orelse = [ self.visit(n) for n in node.orelse ]
+        return TryExcept(Block(body), except_,orelse if orelse else None)
+
     def visit_If(self, node):
         test = self.visit(node.test)
         body = [ self.visit(n) for n in node.body ]
@@ -311,8 +317,8 @@ class CxxBackend(ast.NodeVisitor):
         type=self.visit(node.type)
         inst=self.visit(node.inst) if node.inst else None
         if inst: return Statement("throw {0}({1})".format(type, inst))
+        elif not isinstance(node.type,ast.Call): return Statement("throw {0}()".format(type, inst))
         else: return Statement("throw {0}".format(type))
-            
 
     def visit_Assert(self, node):
         params = [ self.visit(node.msg) if node.msg else None, self.visit(node.test) ]
