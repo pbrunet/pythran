@@ -193,7 +193,7 @@ modules = {
         "__exception__" : {
             "args": AttributeIntr(0),
             },
-        "_complex_" : {
+        "__complex__" : {
                 "real": AttributeIntr(0),
                 "imag": AttributeIntr(1),
                 "conjugate" : MethodIntr(),

@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 namespace pythonic {
-    namespace __exceptions__ {
+   // namespace __exceptions__ {
         class BaseException:public std::exception
         {
                 public:
@@ -64,7 +64,7 @@ namespace pythonic {
         class UnicodeDecodeError:public UnicodeError{};
         class UnicodeEncodeError:public UnicodeError{};
         class UnicodeTranslateError:public UnicodeError{};
-    }
+    //}
 }
 
 #endif

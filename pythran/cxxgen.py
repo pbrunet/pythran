@@ -318,7 +318,7 @@ class TryExcept(Generable):
         assert isinstance(try_, Generable)
         if else_ is not None:
             assert isinstance(else_, Generable)
-        for a,b in except_:
+        for a,b,c in except_:
             assert isinstance(b, Generable)
         self.except_ = except_
         self.else_ = else_
@@ -333,11 +333,11 @@ class TryExcept(Generable):
             for line in self.try_.generate():
                 yield "  "+line
 
-        for name,body in self.except_:
+        for name,body,alias in self.except_:
             if name==None:
                 yield "catch(...)"
             else:
-                yield "catch (%s const& e)" % name
+                yield "catch (%s const& %s)" % (name,alias if alias else 'e')
             if isinstance(body, Block):
                 for line in body.generate():
                     yield line

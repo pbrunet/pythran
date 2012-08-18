@@ -303,7 +303,7 @@ class CxxBackend(ast.NodeVisitor):
 
     def visit_TryExcept(self, node):
         body = [ self.visit(n) for n in node.body ]
-        except_ = [ (n.type.id if n.type else None,Block([ self.visit(m) for m in n.body ])) for n in node.handlers ]
+        except_ = [ (n.type.id if n.type else None,Block([ self.visit(m) for m in n.body ]),n.name.id if n.name else None) for n in node.handlers ]
         orelse = [ self.visit(n) for n in node.orelse ]
         return TryExcept(Block(body), except_,orelse if orelse else None)
 
