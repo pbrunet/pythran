@@ -193,6 +193,14 @@ namespace pythonic {
         } 
     PROXY(pythonic,list);
 
+    /* exception */
+    template<typename ... Types>
+    core::BaseException BaseException(Types ... args) {
+        return core::BaseException(args ...);
+    }
+
+    PROXY(pythonic,BaseException);
+
     /* tuple */
     template <class Iterable>
         struct _tuple {

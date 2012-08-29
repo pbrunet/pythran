@@ -317,7 +317,6 @@ class CxxBackend(ast.NodeVisitor):
         type=self.visit(node.type)
         inst=self.visit(node.inst) if node.inst else None
         if inst: return Statement("throw {0}({1})".format(type, inst))
-        elif not isinstance(node.type,ast.Call): return Statement("throw {0}()".format(type, inst))
         else: return Statement("throw {0}".format(type))
 
     def visit_Assert(self, node):

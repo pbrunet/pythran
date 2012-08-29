@@ -89,6 +89,10 @@ namespace std {
 
     GET_COMPLEX(double)
 
+    /* for exception */
+    template <size_t I,class ... Types>
+        auto get( core::BaseException t) -> decltype(t.getArgs()) { return t.getArgs(); }
+
 }
 namespace pythonic {
     namespace proxy {

@@ -83,6 +83,7 @@ type_to_suffix = {
 modules = {
         "__builtins__": {
             "abs": FunctionIntr(),
+            "BaseException": FunctionIntr(),
             "all": FunctionIntr(),
             "any": FunctionIntr(),
             "bin": FunctionIntr(),

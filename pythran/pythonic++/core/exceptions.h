@@ -1,21 +1,25 @@
 #ifndef PYTHONIC_EXCEPTIONS_H
 #define PYTHONIC_EXCEPTIONS_H
 #include <stdexcept>
+#include <string>
 
 namespace pythonic {
-   // namespace __exceptions__ {
-        class BaseException:public std::exception
+    namespace core {
+        class BaseException: public std::exception
         {
-                public:
-                        BaseException(){}
-                        BaseException(std::string value){val = value;}
-                        virtual std::string getVal() const{ return val;}
-                        virtual ~BaseException() throw(){}
-                protected:
-                        std::string val;
+            public:
+                    template<class ... Types>
+                    BaseException(Types& ... types){init<Types ...>(types ...);}
+                    virtual core::list<std::string> getArgs() const{ return core::list<std::string>(args.begin(), args.end());} //not perfect but how to do in another way? conversion from list to tuple may need to be improve...
+                    virtual ~BaseException() throw(){}
+            protected:
+                    template<typename T, class ... Types>
+                    void init(T& first, Types& ... types){ args.push_back(first); init<Types ...>(types ...);}
+                    template<typename T>
+                    void init(T& first){args.push_back(first);}
+                    std::vector<std::string> args;
         };
-
-        class SystemExit:public BaseException{};
+     /*   class SystemExit:public BaseException{};
         class KeyboardInterrupt:public BaseException{};
         class GeneratorExit:public BaseException{};
         class Exception:public BaseException{};
@@ -42,7 +46,13 @@ namespace pythonic {
         class MemoryError:public StandardError{};
         class NameError:public StandardError{};
         class ReferenceError:public StandardError{};
-        class RuntimeError:public BaseException{};
+        template <class T>
+        class RuntimeError:public BaseException<T>{
+            public:
+                RuntimeError(){}
+                ~RuntimeError() throw(){}
+                RuntimeError(T& type):BaseException<T>(type){}
+        };
         class SyntaxError:public StandardError{};
         class SystemError:public StandardError{};
         class TypeError:public StandardError{};
@@ -63,8 +73,8 @@ namespace pythonic {
         class UnicodeError:public ValueError{};
         class UnicodeDecodeError:public UnicodeError{};
         class UnicodeEncodeError:public UnicodeError{};
-        class UnicodeTranslateError:public UnicodeError{};
-    //}
+        class UnicodeTranslateError:public UnicodeError{};*/
+    }
 }
 
 #endif

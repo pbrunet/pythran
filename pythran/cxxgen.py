@@ -337,7 +337,7 @@ class TryExcept(Generable):
             if name==None:
                 yield "catch(...)"
             else:
-                yield "catch (%s const& %s)" % (name,alias if alias else 'e')
+                yield "catch (core::%s const& %s)" % (name,alias if alias else 'e')
             if isinstance(body, Block):
                 for line in body.generate():
                     yield line
