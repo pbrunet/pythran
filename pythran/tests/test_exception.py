@@ -156,7 +156,10 @@ class TestException(TestEnv):
         self.run_test("def multiple_exception_():\n try:\n  raise OverflowError('a','b','c')\n except IOError:\n  print('bad')\n except OverflowError as e:\n  print e.args", multiple_exception_=[])
 
     def test_multiple_tuple_exception(self):
-        self.run_test("def multiple_tuple_exception_():\n try:\n raise OverflowError('a','b','c')\n except (IOError, OSError):\n  print('ok')", multiple_tuple_exception_=[])
+        self.run_test("def multiple_tuple_exception_():\n try:\n  raise OverflowError('a','b','c')\n except (IOError, OSError):\n  print('bad')\n except OverflowError as e:\n  print(e.args)", multiple_tuple_exception_=[])
 
     def test_reraise_exception(self):
-        self.run_test("def reraise_exception_():\n try:\n raise OverflowError('a','b','c')\n except IOError:\n  raise\n except: print('ok')", reraise_exception_=[])
+        self.run_test("def reraise_exception_():\n try:\n  raise OverflowError('a','b','c')\n except IOError:\n  raise\n except:  print('ok')", reraise_exception_=[])
+
+    def test_raiseinst_exception(self):
+        self.run_test("def raiseinst_exception_():\n try:\n  raise OverflowError, ('a','b','c')\n except OverflowError as e:\n  print(e.args)", raiseinst_exception_=[])

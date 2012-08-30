@@ -322,8 +322,15 @@ class CxxBackend(ast.NodeVisitor):
 
     def visit_Raise(self, node):
         type=self.visit(node.type) if node.type else None
-        inst=self.visit(node.inst) if node.inst else None
-        if inst: return Statement("throw {0}({1})".format(type, inst))
+        if node.inst:
+            if isinstance(node.inst,ast.Tuple):
+                inst = [ '"' + e.s + '"' for e in node.inst.elts]
+            else:
+                inst = [node.inst.s]
+        else:
+            inst = None
+        #inst=self.visit(node.inst) if node.inst else None
+        if inst: return Statement("throw {0}({1})".format(type, ", ".join(inst)))
         else: return Statement("throw {0}".format(type if type else ""))
 
     def visit_Assert(self, node):
