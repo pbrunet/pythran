@@ -1,5 +1,5 @@
 #pythran export pi_estimate(int)
-from math import sqrt, pow
+from math import sqrt
 from random import random
 
 def pi_estimate(DARTS):

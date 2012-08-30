@@ -303,7 +303,14 @@ class CxxBackend(ast.NodeVisitor):
 
     def visit_TryExcept(self, node):
         body = [ self.visit(n) for n in node.body ]
-        except_ = [ (n.type.id if n.type else None,Block([ self.visit(m) for m in n.body ]),n.name.id if n.name else None) for n in node.handlers ]
+        except_ = list()
+        for n in node.handlers:
+            if not isinstance(n.type,ast.Tuple):
+                except_.append((n.type.id if n.type else None,Block([ self.visit(m) for m in n.body ]),n.name.id if n.name else None))
+            else:
+                elts = [ p.id for p in n.type.elts ]
+                for o in elts:
+                    except_.append((o,Block([ self.visit(m) for m in n.body ]),n.name.id if n.name else None))
         orelse = [ self.visit(n) for n in node.orelse ]
         return TryExcept(Block(body), except_,orelse if orelse else None)
 
@@ -314,10 +321,10 @@ class CxxBackend(ast.NodeVisitor):
         return If(test, Block(body), Block(orelse) if orelse else None )
 
     def visit_Raise(self, node):
-        type=self.visit(node.type)
+        type=self.visit(node.type) if node.type else None
         inst=self.visit(node.inst) if node.inst else None
         if inst: return Statement("throw {0}({1})".format(type, inst))
-        else: return Statement("throw {0}".format(type))
+        else: return Statement("throw {0}".format(type if type else ""))
 
     def visit_Assert(self, node):
         params = [ self.visit(node.msg) if node.msg else None, self.visit(node.test) ]

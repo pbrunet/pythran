@@ -201,6 +201,349 @@ namespace pythonic {
 
     PROXY(pythonic,BaseException);
 
+    template<typename ... Types>
+    core::SystemExit SystemExit(Types ... args) {
+        return core::SystemExit(args ...);
+    }
+
+    PROXY(pythonic,SystemExit);
+
+    template<typename ... Types>
+    core::KeyboardInterrupt KeyboardInterrupt(Types ... args) {
+        return core::KeyboardInterrupt(args ...);
+    }
+
+    PROXY(pythonic,KeyboardInterrupt);
+
+    template<typename ... Types>
+    core::GeneratorExit GeneratorExit(Types ... args) {
+        return core::GeneratorExit(args ...);
+    }
+
+    PROXY(pythonic,GeneratorExit);
+
+    template<typename ... Types>
+    core::Exception Exception(Types ... args) {
+        return core::Exception(args ...);
+    }
+
+    PROXY(pythonic,Exception);
+
+    template<typename ... Types>
+    core::StopIteration StopIteration(Types ... args) {
+        return core::StopIteration(args ...);
+    }
+
+    PROXY(pythonic,StopIteration);
+
+    template<typename ... Types>
+    core::StandardError StandardError(Types ... args) {
+        return core::StandardError(args ...);
+    }
+
+    PROXY(pythonic,StandardError);
+
+    template<typename ... Types>
+    core::Warning Warning(Types ... args) {
+        return core::Warning(args ...);
+    }
+
+    PROXY(pythonic,Warning);
+
+    template<typename ... Types>
+    core::BytesWarning BytesWarning(Types ... args) {
+        return core::BytesWarning(args ...);
+    }
+
+    PROXY(pythonic,BytesWarning);
+
+    template<typename ... Types>
+    core::UnicodeWarning UnicodeWarning(Types ... args) {
+        return core::UnicodeWarning(args ...);
+    }
+
+    PROXY(pythonic,UnicodeWarning);
+
+    template<typename ... Types>
+    core::ImportWarning ImportWarning(Types ... args) {
+        return core::ImportWarning(args ...);
+    }
+
+    PROXY(pythonic,ImportWarning);
+
+    template<typename ... Types>
+    core::FutureWarning FutureWarning(Types ... args) {
+        return core::FutureWarning(args ...);
+    }
+
+    PROXY(pythonic,FutureWarning);
+
+    template<typename ... Types>
+    core::UserWarning UserWarning(Types ... args) {
+        return core::UserWarning(args ...);
+    }
+
+    PROXY(pythonic,UserWarning);
+
+    template<typename ... Types>
+    core::SyntaxWarning SyntaxWarning(Types ... args) {
+        return core::SyntaxWarning(args ...);
+    }
+
+    PROXY(pythonic,SyntaxWarning);
+
+    template<typename ... Types>
+    core::RuntimeWarning RuntimeWarning(Types ... args) {
+        return core::RuntimeWarning(args ...);
+    }
+
+    PROXY(pythonic,RuntimeWarning);
+
+    template<typename ... Types>
+    core::PendingDeprecationWarning PendingDeprecationWarning(Types ... args) {
+        return core::PendingDeprecationWarning(args ...);
+    }
+
+    PROXY(pythonic,PendingDeprecationWarning);
+
+    template<typename ... Types>
+    core::DeprecationWarning DeprecationWarning(Types ... args) {
+        return core::DeprecationWarning(args ...);
+    }
+
+    PROXY(pythonic,DeprecationWarning);
+
+    template<typename ... Types>
+    core::BufferError BufferError(Types ... args) {
+        return core::BufferError(args ...);
+    }
+
+    PROXY(pythonic,BufferError);
+
+    template<typename ... Types>
+    core::ArithmeticError ArithmeticError(Types ... args) {
+        return core::ArithmeticError(args ...);
+    }
+
+    PROXY(pythonic,ArithmeticError);
+
+    template<typename ... Types>
+    core::AssertionError AssertionError(Types ... args) {
+        return core::AssertionError(args ...);
+    }
+
+    PROXY(pythonic,AssertionError);
+
+    template<typename ... Types>
+    core::AttributeError AttributeError(Types ... args) {
+        return core::AttributeError(args ...);
+    }
+
+    PROXY(pythonic,AttributeError);
+
+    template<typename ... Types>
+    core::EnvironmentError EnvironmentError(Types ... args) {
+        return core::EnvironmentError(args ...);
+    }
+
+    PROXY(pythonic,EnvironmentError);
+
+    template<typename ... Types>
+    core::EOFError EOFError(Types ... args) {
+        return core::EOFError(args ...);
+    }
+
+    PROXY(pythonic,EOFError);
+
+    template<typename ... Types>
+    core::ImportError ImportError(Types ... args) {
+        return core::ImportError(args ...);
+    }
+
+    PROXY(pythonic,ImportError);
+
+    template<typename ... Types>
+    core::LookupError LookupError(Types ... args) {
+        return core::LookupError(args ...);
+    }
+
+    PROXY(pythonic,LookupError);
+
+    template<typename ... Types>
+    core::MemoryError MemoryError(Types ... args) {
+        return core::MemoryError(args ...);
+    }
+
+    PROXY(pythonic,MemoryError);
+
+    template<typename ... Types>
+    core::NameError NameError(Types ... args) {
+        return core::NameError(args ...);
+    }
+
+    PROXY(pythonic,NameError);
+
+    template<typename ... Types>
+    core::ReferenceError ReferenceError(Types ... args) {
+        return core::ReferenceError(args ...);
+    }
+
+    PROXY(pythonic,ReferenceError);
+
+    template<typename ... Types>
+    core::RuntimeError RuntimeError(Types ... args) {
+        return core::RuntimeError(args ...);
+    }
+
+    PROXY(pythonic,RuntimeError);
+
+    template<typename ... Types>
+    core::SyntaxError SyntaxError(Types ... args) {
+        return core::SyntaxError(args ...);
+    }
+
+    PROXY(pythonic,SyntaxError);
+
+    template<typename ... Types>
+    core::SystemError SystemError(Types ... args) {
+        return core::SystemError(args ...);
+    }
+
+    PROXY(pythonic,SystemError);
+
+    template<typename ... Types>
+    core::TypeError TypeError(Types ... args) {
+        return core::TypeError(args ...);
+    }
+
+    PROXY(pythonic,TypeError);
+
+    template<typename ... Types>
+    core::ValueError ValueError(Types ... args) {
+        return core::ValueError(args ...);
+    }
+
+    PROXY(pythonic,ValueError);
+
+    template<typename ... Types>
+    core::FloatingPointError FloatingPointError(Types ... args) {
+        return core::FloatingPointError(args ...);
+    }
+
+    PROXY(pythonic,FloatingPointError);
+
+    template<typename ... Types>
+    core::OverflowError OverflowError(Types ... args) {
+        return core::OverflowError(args ...);
+    }
+
+    PROXY(pythonic,OverflowError);
+
+    template<typename ... Types>
+    core::ZeroDivisionError ZeroDivisionError(Types ... args) {
+        return core::ZeroDivisionError(args ...);
+    }
+
+    PROXY(pythonic,ZeroDivisionError);
+
+    template<typename ... Types>
+    core::IOError IOError(Types ... args) {
+        return core::IOError(args ...);
+    }
+
+    PROXY(pythonic,IOError);
+
+    template<typename ... Types>
+    core::OSError OSError(Types ... args) {
+        return core::OSError(args ...);
+    }
+
+    PROXY(pythonic,OSError);
+
+    template<typename ... Types>
+    core::WindowsError WindowsError(Types ... args) {
+        return core::WindowsError(args ...);
+    }
+
+    PROXY(pythonic,WindowsError);
+
+    template<typename ... Types>
+    core::VMSError VMSError(Types ... args) {
+        return core::VMSError(args ...);
+    }
+
+    PROXY(pythonic,VMSError);
+
+    template<typename ... Types>
+    core::IndexError IndexError(Types ... args) {
+        return core::IndexError(args ...);
+    }
+
+    PROXY(pythonic,IndexError);
+
+    template<typename ... Types>
+    core::KeyError KeyError(Types ... args) {
+        return core::KeyError(args ...);
+    }
+
+    PROXY(pythonic,KeyError);
+
+    template<typename ... Types>
+    core::UnboundLocalError UnboundLocalError(Types ... args) {
+        return core::UnboundLocalError(args ...);
+    }
+
+    PROXY(pythonic,UnboundLocalError);
+
+    template<typename ... Types>
+    core::NotImplementedError NotImplementedError(Types ... args) {
+        return core::NotImplementedError(args ...);
+    }
+
+    PROXY(pythonic,NotImplementedError);
+
+    template<typename ... Types>
+    core::IndentationError IndentationError(Types ... args) {
+        return core::IndentationError(args ...);
+    }
+
+    PROXY(pythonic,IndentationError);
+
+    template<typename ... Types>
+    core::TabError TabError(Types ... args) {
+        return core::TabError(args ...);
+    }
+
+    PROXY(pythonic,TabError);
+
+    template<typename ... Types>
+    core::UnicodeError UnicodeError(Types ... args) {
+        return core::UnicodeError(args ...);
+    }
+
+    PROXY(pythonic,UnicodeError);
+
+    template<typename ... Types>
+    core::UnicodeDecodeError UnicodeDecodeError(Types ... args) {
+        return core::UnicodeDecodeError(args ...);
+    }
+
+    PROXY(pythonic,UnicodeDecodeError);
+
+    template<typename ... Types>
+    core::UnicodeEncodeError UnicodeEncodeError(Types ... args) {
+        return core::UnicodeEncodeError(args ...);
+    }
+
+    PROXY(pythonic,UnicodeEncodeError);
+
+    template<typename ... Types>
+    core::UnicodeTranslateError UnicodeTranslateError(Types ... args) {
+        return core::UnicodeTranslateError(args ...);
+    }
+
+    PROXY(pythonic,UnicodeTranslateError);
+
     /* tuple */
     template <class Iterable>
         struct _tuple {
