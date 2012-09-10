@@ -139,6 +139,7 @@ modules = {
             "chr": FunctionIntr(),
             "cmp": FunctionIntr(),
             "complex": FunctionIntr(),
+            "dict": FunctionIntr(),
             "divmod": FunctionIntr(),
             "enumerate": FunctionIntr(),
             "filter": FunctionIntr(),
@@ -208,6 +209,7 @@ modules = {
             "isnan" : FunctionIntr(),
             "ceil" : FunctionIntr(),
             "floor" : FunctionIntr(),
+            "pow" : FunctionIntr(),
             "pi" : ScalarIntr(),
             "e" : ScalarIntr(),
             },
@@ -231,7 +233,7 @@ modules = {
             "extend" : MethodIntr([lambda self, node: self.combine(node.args[0], node.args[1], register=True)]),
             "remove" : MethodIntr(),
             "index" : MethodIntr(),
-            "pop" : MethodIntr(),
+            #"pop" : MethodIntr(), forwarded
             "reverse" : MethodIntr(),
             "sort" : MethodIntr(),
             "count" : MethodIntr(),
@@ -251,8 +253,32 @@ modules = {
                 "imag": AttributeIntr(1),
                 "conjugate" : MethodIntr(),
                 },
+        "__dict__" :  {
+                "clear" : MethodIntr(),
+                "copy" : MethodIntr(),
+                "fromkeys" : FunctionIntr(),
+                "get" : MethodIntr(),
+                "has_key" : MethodIntr(),
+                "items" : MethodIntr(),
+                "iteritems" : MethodIntr(),
+                "iterkeys" : MethodIntr(),
+                "itervalues" : MethodIntr(),
+                "keys" : MethodIntr(),
+                #"pop" : MethodIntr(), forwarded
+                "popitem" : MethodIntr(),
+                "setdefault": MethodIntr([lambda self, node: self.combine(node.args[0], node.args[1], unary_op=lambda x:cxxtypes.DictType(x, self.types[node.args[2]]), register=True) if len(node.args) == 3 else () ]),
+                "update": MethodIntr([lambda self, node: self.combine(node.args[0], node.args[1], register=True)]),
+                "values" : MethodIntr(),
+                "viewitems" : MethodIntr(),
+                "viewkeys" : MethodIntr(),
+                "viewvalues" : MethodIntr(),
+                },
         "__iterator__" : {
             "next": MethodIntr(),
+            },
+        # conflicting method names must be listed here
+        "__dispatch__" : {
+                "pop": MethodIntr(),
             },
         "__user__" : {},
         }
@@ -264,6 +290,13 @@ for module, elems in modules.iteritems():
         if signature.ismethod():
             assert elem not in methods # we need unicity
             methods[elem]= ( module, signature )
+
+# a function name to module binding
+functions ={}
+for module, elems in modules.iteritems():
+    for elem, signature in elems.iteritems():
+        if signature.isstaticfunction():
+            functions.setdefault(elem,[]).append( ( module, signature ) )
 
 # a attribute name to module binding
 attributes={}

@@ -1,5 +1,6 @@
+#runas pi_estimate(10000000)
 #pythran export pi_estimate(int)
-from math import sqrt
+from math import sqrt, pow
 from random import random
 
 def pi_estimate(DARTS):

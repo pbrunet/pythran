@@ -9,7 +9,7 @@ from tables import type_to_str, operator_to_lambda, modules, builtin_constants, 
 from analysis import global_declarations, constant_value, ordered_global_declarations, type_aliasing, yields
 from syntax import PythranSyntaxError
 from cxxtypes import *
-from intrinsic import ScalarIntr, MethodIntr
+from intrinsic import MethodIntr
 
 import types
 def copy_func(f, name=None):
@@ -146,6 +146,9 @@ class TypeDependencies(ast.NodeVisitor):
 
     def visit_Set(self, node):
         return reduce(operator.add, map(self.visit,node.elts), [set()])
+
+    def visit_Dict(self, node):
+        return reduce(operator.add, map(self.visit,node.keys)+map(self.visit,node.values), [set()])
 
     def visit_Tuple(self, node):
         return reduce(operator.add, map(self.visit,node.elts), [set()])
@@ -286,14 +289,18 @@ class Typing(ast.NodeVisitor):
         self.visit(node.value)
         for t in node.targets:
             self.combine(t, node.value,register=True)
+            if isinstance(t, ast.Subscript):
+                self.visit_AssignedSubscript(t)
 
     def visit_AugAssign(self, node):
         self.visit(node.value)
         self.combine(node.target, node.value, lambda x,y:ExpressionType(operator_to_lambda[type(node.op)],[x,y]), register=True)
+        if isinstance(node.target, ast.Subscript):
+            self.visit_AssignedSubscript(node.target)
 
     def visit_For(self, node):
         self.visit(node.iter)
-        self.combine(node.target, node.iter, unary_op=lambda x:ContentType(x), register=True)
+        self.combine(node.target, node.iter, unary_op=lambda x:IteratorContentType(x), register=True)
         self.visit(node.target)
         if node.body:
             [self.visit(n) for n in node.body]
@@ -348,7 +355,7 @@ class Typing(ast.NodeVisitor):
         self.types[node]=NamedType(type_to_str[type(node.n)])
 
     def visit_Str(self, node):
-        self.types[node]=NamedType("std::string")
+        self.types[node]=NamedType("core::string")
 
     def visit_Attribute(self, node):
         value, attr = (node.value, node.attr)
@@ -368,6 +375,11 @@ class Typing(ast.NodeVisitor):
             except:
                 f=lambda t: ContentType(t)
         self.combine(node, node.value, unary_op=f)
+
+    def visit_AssignedSubscript(self, node):
+        if not isinstance(node.slice, ast.Slice):
+            self.visit(node.slice)
+            self.combine(node.value, node.slice, unary_op=lambda t: IndexableType(t), register=True)
 
     def visit_Name(self, node):
         if node.id in self.name_to_nodes:
@@ -408,6 +420,14 @@ class Typing(ast.NodeVisitor):
             #    elts = [ p.id for p in node.type.elts ]
              #   [(o,name) for o in elts]
         [self.visit(n) for n in node.body]
+
+    def visit_Dict(self, node):
+        if node.keys:
+            [self.visit(elt) for elt in node.keys]
+            [self.visit(elt) for elt in node.values]
+            [self.combine(node, key, unary_op=lambda x:DictType(x,self.types[value])) for key,value in zip(node.keys, node.values)]
+        else:
+            self.types[node]=NamedType("core::empty_dict")
 
     def visit_Tuple(self, node):
         [self.visit(elt) for elt in node.elts]
