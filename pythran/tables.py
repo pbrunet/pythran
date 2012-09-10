@@ -242,6 +242,9 @@ modules = {
             },
         "__exception__" : {
             "args": AttributeIntr(0),
+            "errno": AttributeIntr(1),
+            "strerror": AttributeIntr(2),
+            "filename": AttributeIntr(3),
             },
         "_complex_" : {
                 "real": AttributeIntr(0),

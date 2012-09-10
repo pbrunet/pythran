@@ -90,8 +90,27 @@ namespace std {
     GET_COMPLEX(double)
 
     /* for exception */
-    template <size_t I,class ... Types>
-        auto get( core::BaseException t) -> decltype(t.getArgs()) { return t.getArgs(); }
+
+    template <size_t I>
+        struct tuple_element<I, core::BaseException> {
+            typedef typename core::BaseError::Type<0>::type type;
+        };
+
+    template <size_t I>
+        typename core::BaseError::Type<I>::type get( const core::BaseException& t );
+    template <>
+        typename core::BaseError::Type<0>::type get<0>( const core::BaseException& t) { return t.args; }
+
+    template <size_t I>
+        typename core::BaseError::Type<I>::type get( const core::EnvironmentError& t );
+    template <>
+        typename core::BaseError::Type<0>::type get<0>( const core::EnvironmentError& t) { return t.args; }
+    template <>
+        typename core::BaseError::Type<1>::type get<1>( const core::EnvironmentError& t ){ return t.args[0]; }
+    template <>
+        typename core::BaseError::Type<2>::type get<2>( const core::EnvironmentError& t ){ return t.args[1]; }
+    template <>
+        typename core::BaseError::Type<3>::type get<3>( const core::EnvironmentError& t ){ return t.args[2]; }
 
 }
 namespace pythonic {

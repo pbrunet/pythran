@@ -3,6 +3,7 @@
 '''
 import ast
 from cxxgen import *
+from cxxtypes import NamedType
 
 from analysis import local_declarations, global_declarations, constant_value, yields
 
@@ -304,15 +305,17 @@ class CxxBackend(ast.NodeVisitor):
     def visit_TryExcept(self, node):
         body = [ self.visit(n) for n in node.body ]
         except_ = list()
-        for n in node.handlers:
-            if not isinstance(n.type,ast.Tuple):
-                except_.append((n.type.id if n.type else None,Block([ self.visit(m) for m in n.body ]),n.name.id if n.name else None))
-            else:
-                elts = [ p.id for p in n.type.elts ]
-                for o in elts:
-                    except_.append((o,Block([ self.visit(m) for m in n.body ]),n.name.id if n.name else None))
+        [except_.extend(self.visit(n)) for n in node.handlers]
         orelse = [ self.visit(n) for n in node.orelse ]
         return TryExcept(Block(body), except_,orelse if orelse else None)
+
+    def visit_ExceptHandler(self, node):
+        name = self.visit(node.name) if node.name else None;
+        if not isinstance(node.type,ast.Tuple):
+            return [(node.type.id if node.type else None,Block([ self.visit(m) for m in node.body ]),name)]
+        else:
+            elts = [ p.id for p in node.type.elts ]
+            return [(o,Block([ self.visit(m) for m in node.body ]),name) for o in elts]
 
     def visit_If(self, node):
         test = self.visit(node.test)
