@@ -680,6 +680,32 @@ class Module(Block):
             for line in c.generate():
                 yield line
 
+class Class(Block):
+    def __init__(self, name, public=[], private=[], protected=[], parent = None):
+        content = list()
+        if public:
+            content.extend([Line("    public:")])
+            content.extend(public)
+        if private:
+            content.extend([Line("    private:")])
+            content.extend(private)
+        if protected:
+            content.extend([Line("    protected:")])
+            content.extend(protected)
+        Block.__init__(self,content)
+        self.name = name
+        self.parent = parent
+
+    def generate(self):
+        head = ": public {0}".format(self.parent) if self.parent else ""
+        yield  "class " + self.name + head
+        yield  "{"
+        for item in self.contents:
+            for item_line in item.generate():
+                yield "   " + item_line
+        yield "};"
+        yield ""
+
 class Namespace(Block):
     def __init__(self, name, contents=[]):
         Block.__init__(self, contents)
