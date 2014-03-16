@@ -8,6 +8,7 @@ def aliasing0(e):
         if 1:
             t = e
         else:
-            f = e'''
+            f = e
+        return t or f'''
         self.run_test(code, range(10), aliasing0=[[int]])
 

@@ -11,7 +11,7 @@ optimized pythran code
 
 from analysis import ConstantExpressions, OptimizableComprehension
 from analysis import PotentialIterator, Aliases, UseOMP, HasBreak, HasContinue
-from analysis import LazynessAnalysis, UsedDefChain, Literals
+from analysis import LazynessAnalysis, UsedDefChain, Literals, PureExpressions
 from passmanager import Transformation
 from tables import modules, equivalent_iterators
 from passes import NormalizeTuples, RemoveNestedFunctions, RemoveLambdas
@@ -494,3 +494,38 @@ class ForwardSubstitution(Transformation):
                         not isinstance(D[0].ctx, ast.Param)):
                     node = _LazyRemover(self.ctx, U, D[0]).visit(node)
         return node
+
+
+class RemoveUselessStmt(Transformation):
+    """
+        Remove useless statement like:
+            - assignment to unused variables
+
+        >>> import ast, passmanager, backend
+        >>> pm = passmanager.PassManager("test")
+        >>> node = ast.parse("def foo(): a = [2, 3]; return 1")
+        >>> node = pm.apply(RemoveUselessStmt, node)
+        >>> print pm.dump(backend.Python, node)
+        def foo():
+            return 1
+    """
+    def __init__(self):
+        super(RemoveUselessStmt, self).__init__(PureExpressions,
+                                                UsedDefChain)
+
+    def visit_Assign(self, node):
+        new_targets = []
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                udc = self.used_def_chain[target.id]
+                if len(udc) != 1:
+                    new_targets.append(target)
+            else:
+                new_targets.append(target)
+        node.targets = new_targets
+        if new_targets:
+            return node
+        elif node.value in self.pure_expressions:
+            return None
+        else:
+            return ast.Expr(value=node.value)
