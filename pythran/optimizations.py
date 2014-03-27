@@ -500,10 +500,26 @@ class RemoveUselessStmt(Transformation):
     """
         Remove useless statement like:
             - assignment to unused variables
+            - remove alone pure statement
 
         >>> import ast, passmanager, backend
         >>> pm = passmanager.PassManager("test")
         >>> node = ast.parse("def foo(): a = [2, 3]; return 1")
+        >>> node = pm.apply(RemoveUselessStmt, node)
+        >>> print pm.dump(backend.Python, node)
+        def foo():
+            return 1
+        >>> node = ast.parse("def foo(): 'a simple string'; return 1")
+        >>> node = pm.apply(RemoveUselessStmt, node)
+        >>> print pm.dump(backend.Python, node)
+        def foo():
+            return 1
+        >>> node = ast.parse('''
+def bar(a):
+    return a
+def foo(a):
+    bar(a)
+    return 1''')
         >>> node = pm.apply(RemoveUselessStmt, node)
         >>> print pm.dump(backend.Python, node)
         def foo():
@@ -529,3 +545,8 @@ class RemoveUselessStmt(Transformation):
             return None
         else:
             return ast.Expr(value=node.value)
+
+    def visit_Expr(self, node):
+        if node in self.pure_expressions:
+            return ast.Pass()
+        return node
