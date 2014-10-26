@@ -332,6 +332,7 @@ class LazynessAnalysis(FunctionAnalysis):
         md.visit(self, node)
         map(self.visit, node.args)
         self.func_args_lazyness(node.func, node.args, node)
+        self.visit(node.func)
 
     def run(self, node, ctx):
         super(LazynessAnalysis, self).run(node, ctx)
