@@ -1,6 +1,4 @@
-"""
-Aliases gather aliasing informations
-"""
+""" Aliases gather aliasing informations. """
 
 from pythran.analyses.global_declarations import GlobalDeclarations
 from pythran.intrinsic import Intrinsic, Class
