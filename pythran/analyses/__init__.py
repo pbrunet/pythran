@@ -10,6 +10,7 @@ import analyses.Foo
 """
 
 from .aliases import Aliases, StrictAliases
+from .new_alias import NewAliases
 from .ancestors import Ancestors
 from .argument_effects import ArgumentEffects
 from .argument_read_once import ArgumentReadOnce

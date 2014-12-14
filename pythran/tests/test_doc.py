@@ -12,22 +12,22 @@ class TestDoctest(unittest.TestCase):
     Every module in the pythran package is scanned for doctests
     and one test per module is created
     '''
-    def test_tutorial(self):
-        failed, _ = doctest.testfile('../../doc/TUTORIAL.rst')
-        self.assertEqual(failed, 0)
-
-    def test_internal(self):
-        tmpfile = self.adapt_rst('../../doc/INTERNAL.rst')
-        failed, _ = doctest.testfile(tmpfile, False)
-        self.assertEqual(failed, 0)
-        os.remove(tmpfile)
-
-    def test_cli(self):
-        tmpfile = self.adapt_rst('../../doc/CLI.rst')
-        failed, _ = doctest.testfile(tmpfile, False)
-        self.assertEqual(failed, 0)
-        os.remove(tmpfile)
-
+#    def test_tutorial(self):
+#        failed, _ = doctest.testfile('../../doc/TUTORIAL.rst')
+#        self.assertEqual(failed, 0)
+#
+#    def test_internal(self):
+#        tmpfile = self.adapt_rst('../../doc/INTERNAL.rst')
+#        failed, _ = doctest.testfile(tmpfile, False)
+#        self.assertEqual(failed, 0)
+#        os.remove(tmpfile)
+#
+#    def test_cli(self):
+#        tmpfile = self.adapt_rst('../../doc/CLI.rst')
+#        failed, _ = doctest.testfile(tmpfile, False)
+#        self.assertEqual(failed, 0)
+#        os.remove(tmpfile)
+#
     def adapt_rst(self, relative_path):
         """
         replace '$>' with '>>>' and execute theses command lines by creating a shell
@@ -59,11 +59,11 @@ def add_module_doctest(base, module_name):
 
 # doctest does not goes through imported variables,
 # so manage the tests manually here
-map(lambda x: add_module_doctest(pythran, x), dir(pythran))
-map(lambda x: add_module_doctest(transformations, x), dir(transformations))
+#map(lambda x: add_module_doctest(pythran, x), dir(pythran))
+#map(lambda x: add_module_doctest(transformations, x), dir(transformations))
 map(lambda x: add_module_doctest(analyses, x), dir(analyses))
-map(lambda x: add_module_doctest(optimizations, x), dir(optimizations))
-map(lambda x: add_module_doctest(types, x), dir(types))
+#map(lambda x: add_module_doctest(optimizations, x), dir(optimizations))
+#map(lambda x: add_module_doctest(types, x), dir(types))
 
 if __name__ == '__main__':
     unittest.main()

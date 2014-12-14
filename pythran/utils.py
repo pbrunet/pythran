@@ -42,3 +42,27 @@ def get_variable(assignable):
     while isinstance(assignable, ast.Subscript):
         assignable = assignable.value
     return assignable
+
+
+def get_depth(assignable):
+    """
+    Return modified variable name.
+
+    >>> import ast
+    >>> ref = ast.Subscript(
+    ...     value=ast.Subscript(
+    ...         value=ast.Name(id='a', ctx=ast.Load()),
+    ...         slice=ast.Index(value=ast.Name(id='i', ctx=ast.Load())),
+    ...         ctx=ast.Load()),
+    ...     slice=ast.Index(value=ast.Name(id='j', ctx=ast.Load())),
+    ...     ctx=ast.Load())
+    >>> ast.dump(get_variable(ref))
+    "Name(id='a', ctx=Load())"
+    """
+    msg = "Only name and subscript can be assigned."
+    assert isinstance(assignable, (ast.Name, ast.Subscript)), msg
+    depth = 0
+    while isinstance(assignable, ast.Subscript):
+        assignable = assignable.value
+        depth += 1
+    return depth
