@@ -149,7 +149,7 @@ namespace pythonic {
                     operator[](E const& expr) const {
                         return numpy_fexpr<numpy_fexpr, E>(*this, expr);
                     }
-                long flat_size() const { return shape[0]; }
+                size_t flat_size() const { return shape[0]; }
             };
 
     }
