@@ -29,7 +29,7 @@ namespace pythonic {
                 typedef decltype(Op()(std::declval<typename std::remove_reference<Args>::type::dtype>()...)) dtype;
 
                 std::tuple<typename std::remove_reference<Args>::type...> args;
-                array<long, value> shape;
+                types::array<long, value> shape;
 
                 numpy_expr() {}
                 numpy_expr(numpy_expr const&) = default;
@@ -88,13 +88,13 @@ namespace pythonic {
                     }
 
                 template<int... I>
-                long _flat_size(utils::seq<I...>) const {
-                  std::array<long, sizeof...(I)> sizes = {
-                    std::get<I-1>(args).flat_size()...
+                size_t _flat_size(utils::seq<I...>) const {
+                  std::array<size_t, sizeof...(I)> sizes = {
+                    static_cast<size_t>(std::get<I-1>(args).flat_size())...
                   };
                   return *std::max_element(sizes.begin(), sizes.end());
                 }
-                long flat_size() const {
+                size_t flat_size() const {
                   return _flat_size(typename utils::gens<1+sizeof...(Args)>::type{}); }
             };
 

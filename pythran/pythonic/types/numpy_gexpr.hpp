@@ -5,6 +5,9 @@ namespace pythonic {
 
     namespace types {
 
+        template<class T>
+        struct numpy_iexpr;
+
         /* helper to count new axis
          */
         template <class... T> struct count_new_axis;
@@ -392,6 +395,12 @@ namespace pythonic {
                     return numpy_gexpr<numpy_gexpr, contiguous_slice, Sp...>(*this, s0, s...);
                 }
 
+          //      template<class... Sp>
+          //      auto operator()(long s0, Sp const&... s) const -> decltype(this->fast(s0)(s...))
+          //      {
+          //          return this->fast(s0)(s...);
+          //      }
+
                 //sliced array from sliced array is just a sliced array with modified first sliced dimension
                 numpy_gexpr operator[](slice const& s) const
                 {
@@ -428,8 +437,8 @@ namespace pythonic {
                         return numpy_fexpr<numpy_gexpr, F>(*this, filter);
                     }
 
-                long flat_size() const {
-                    return std::accumulate(shape.begin() + 1, shape.end(), *shape.begin(), std::multiplies<long>());
+                size_t flat_size() const {
+                    return std::accumulate(shape.begin() + 1, shape.end(), *shape.begin(), std::multiplies<size_t>());
                 }
             };
 
@@ -567,6 +576,39 @@ namespace pythonic {
 
 }
 
+/* type inference stuff  {*/
+#include "pythonic/types/combined.hpp"
+template<class Array, class K, class... Slices>
+struct __combined<pythonic::types::numpy_gexpr<Array, Slices...>, indexable<K>> {
+    typedef pythonic::types::numpy_gexpr<Array, Slices...> type;
+};
+
+template<class Array, class K, class... Slices>
+struct __combined<indexable<K>, pythonic::types::numpy_gexpr<Array, Slices...>> {
+    typedef pythonic::types::numpy_gexpr<Array, Slices...> type;
+};
+
+template<class Array, class K, class V, class... Slices>
+struct __combined<pythonic::types::numpy_gexpr<Array, Slices...>, indexable_container<K,V>> {
+    typedef pythonic::types::numpy_gexpr<Array, Slices...> type;
+};
+
+template<class Array, class K, class V, class... Slices>
+struct __combined<indexable_container<K,V>, pythonic::types::numpy_gexpr<Array, Slices...>> {
+    typedef pythonic::types::numpy_gexpr<Array, Slices...> type;
+};
+
+template<class Array, class K, class... Slices>
+struct __combined<container<K>, pythonic::types::numpy_gexpr<Array, Slices...>> {
+    typedef pythonic::types::numpy_gexpr<Array, Slices...> type;
+};
+
+template<class Array, class K, class... Slices>
+struct __combined<pythonic::types::numpy_gexpr<Array, Slices...>, container<K>> {
+    typedef pythonic::types::numpy_gexpr<Array, Slices...> type;
+};
+
+/*}*/
 
 #endif
 
