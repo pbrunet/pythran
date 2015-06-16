@@ -1,4 +1,5 @@
-import unittest
+""" Tests for the itertools module. """
+
 from test_env import TestEnv
 
 
@@ -22,43 +23,43 @@ class TestItertools(TestEnv):
 
     def test_imap_none(self):
         self.run_test("""
-def imap_none(l0):
-    from itertools import imap
-    t= 0
-    for a in imap(None, l0) :
-        t += a[0]
-    return t
-""", [0,1,2], imap_none=[[int]])
+        def imap_none(l0):
+            from itertools import imap
+            t= 0
+            for a in imap(None, l0) :
+                t += a[0]
+            return t
+        """, [0,1,2], imap_none=[[int]])
 
     def test_imap_none2(self):
         self.run_test("""
-def imap_none2(l0):
-    from itertools import imap
-    t=0
-    for a in imap(None, l0, l0) :
-        t += sum(a)
-    return t
-""", [0,1,2], imap_none2=[[int]])
+        def imap_none2(l0):
+            from itertools import imap
+            t=0
+            for a in imap(None, l0, l0) :
+                t += sum(a)
+            return t
+        """, [0,1,2], imap_none2=[[int]])
 
     def test_imap_none_on_generators(self):
         self.run_test("""
-def imap_none_g(l0):
-    from itertools import imap
-    t= 0
-    for a in imap(None, (y for x in l0 for y in xrange(x))) :
-        t += a[0]
-    return t
-""", [0,1,2], imap_none_g=[[int]])
+        def imap_none_g(l0):
+            from itertools import imap
+            t= 0
+            for a in imap(None, (y for x in l0 for y in xrange(x))) :
+                t += a[0]
+            return t
+        """, [0,1,2], imap_none_g=[[int]])
 
     def test_imap_none2_on_generators(self):
         self.run_test("""
-def imap_none2_g(l0):
-    from itertools import imap
-    t=0
-    for a in imap(None, (z for x in l0 for z in xrange(x)), (z for y in l0 for z in xrange(y))) :
-        t += sum(a)
-    return t
-""", [0,1,2], imap_none2_g=[[int]])
+        def imap_none2_g(l0):
+            from itertools import imap
+            t=0
+            for a in imap(None, (z for x in l0 for z in xrange(x)), (z for y in l0 for z in xrange(y))) :
+                t += sum(a)
+            return t
+        """, [0,1,2], imap_none2_g=[[int]])
 
     def test_ifilter_init(self):
         self.run_test("def ifilter_init(l0): from itertools import ifilter; return list(ifilter(lambda x: x > 2 , l0))", [0,1,2,3,4,5], ifilter_init=[[int]])
@@ -71,13 +72,13 @@ def imap_none2_g(l0):
 
     def test_ifilter_none(self):
         self.run_test("""
-def ifiltern_(l0):
-  from itertools import ifilter;
-  s = 0
-  for b in (ifilter(None, l0)):
-    s += 1
-  return b,s
-""", [True,False,True,True], ifiltern_=[[bool]])
+        def ifiltern_(l0):
+          from itertools import ifilter;
+          s = 0
+          for b in (ifilter(None, l0)):
+            s += 1
+          return b,s
+        """, [True,False,True,True], ifiltern_=[[bool]])
 
     def test_product(self):
         self.run_test("def product_(l0,l1): from itertools import product; return sum(map(lambda (x,y) : x*y, product(l0,l1)))", [0,1,2,3,4,5], [10,11], product_=[[int],[int]])
@@ -95,10 +96,28 @@ def ifiltern_(l0):
         self.run_test("def izipg_(l0,l1): from itertools import izip; return sum(map(lambda (x,y) : x*y, izip((z for x in l0 for z in xrange(x)),(z for x in l1 for z in xrange(x)))))", [0,1,2,3], [3,2,1,0], izipg_=[[int],[int]])
 
     def test_islice0(self):
-        self.run_test("def islice0(l): from itertools import islice ; return [x for x in islice(l, 1,30,3)]", range(100), islice0=[[int]])
+        """ Check islice with begin, end and step. """
+        self.run_test("""
+        def islice0(l):
+            from itertools import islice
+            return [x for x in islice(l, 1,30,3)]
+        """, range(100), islice0=[[int]])
 
     def test_islice1(self):
-        self.run_test("def islice1(l): from itertools import islice ; return [x for x in islice(l, 16)]", range(100), islice1=[[int]])
+        """ Check islice only with end. """
+        self.run_test("""
+        def islice1(l):
+            from itertools import islice
+            return [x for x in islice(l, 16)]
+        """, range(100), islice1=[[int]])
+
+    def test_islice2(self):
+        """ Check islice with too short iterator. """
+        self.run_test("""
+        def islice2(l):
+            from itertools import islice
+            return [x for x in islice(l, 16)]
+        """, range(10), islice2=[[int]])
 
     def test_count0(self):
         self.run_test("def count0(): from itertools import count ; c = count() ; next(c); next(c); return next(c)", count0=[])
