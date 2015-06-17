@@ -1,8 +1,9 @@
 #ifndef PYTHONIC_INCLUDE_ITERTOOLS_PRODUCT_HPP
 #define PYTHONIC_INCLUDE_ITERTOOLS_PRODUCT_HPP
 
+#include "pythonic/include/itertools/common.hpp"
 #include "pythonic/include/utils/iterator.hpp"
-#include "pythonic/itertools/common.hpp"
+#include "pythonic/include/utils/proxy.hpp"
 
 #include <iterator>
 #include <type_traits>
