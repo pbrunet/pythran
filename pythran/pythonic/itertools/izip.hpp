@@ -2,8 +2,10 @@
 #define PYTHONIC_ITERTOOLS_IZIP_HPP
 
 #include "pythonic/include/itertools/izip.hpp"
+
 #include "pythonic/__builtin__/None.hpp"
 #include "pythonic/itertools/imap.hpp"
+#include "pythonic/utils/proxy.hpp"
 
 namespace pythonic
 {
