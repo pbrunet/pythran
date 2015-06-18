@@ -3,6 +3,7 @@
 
 #include "pythonic/include/utils/proxy.hpp"
 #include "pythonic/include/types/set.hpp"
+#include "pythonic/include/types/none.hpp"
 
 namespace pythonic
 {
@@ -14,10 +15,10 @@ namespace pythonic
     {
 
       template <class T, class F>
-      void add(types::set<T> &s, F const &value);
+      types::none_type add(types::set<T> &s, F const &value);
 
       template <class T, class F>
-      void add(types::set<T> &&s, F const &value);
+      types::none_type add(types::set<T> &&s, F const &value);
 
       PROXY_DECL(pythonic::__builtin__::set, add);
     }

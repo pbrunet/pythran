@@ -3,6 +3,8 @@
 
 #include "pythonic/include/__builtin__/set/discard.hpp"
 
+#include "pythonic/__builtin__/None.hpp"
+#include "pythonic/types/none.hpp"
 #include "pythonic/types/set.hpp"
 #include "pythonic/utils/proxy.hpp"
 
@@ -15,21 +17,24 @@ namespace pythonic
     namespace set
     {
       template <class T, class U>
-      void discard(types::set<T> &set, U const &elem)
+      types::none_type discard(types::set<T> &set, U const &elem)
       {
         set.discard(elem);
+        return __builtin__::None;
       }
 
       template <class T, class U>
-      void discard(types::set<T> &&set, U const &elem)
+      types::none_type discard(types::set<T> &&set, U const &elem)
       {
         // nothing to be done for lvalue
+        return __builtin__::None;
       }
 
       template <class U>
-      void discard(types::empty_set const &set, U const &elem)
+      types::none_type discard(types::empty_set const &set, U const &elem)
       {
         // nothing to remove in an empty_set
+        return __builtin__::None;
       }
 
       PROXY_IMPL(pythonic::__builtin__::set, discard);

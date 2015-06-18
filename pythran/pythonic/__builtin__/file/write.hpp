@@ -3,7 +3,9 @@
 
 #include "pythonic/include/__builtin__/file/write.hpp"
 
+#include "pythonic/__builtin__/None.hpp"
 #include "pythonic/types/file.hpp"
+#include "pythonic/types/none.hpp"
 #include "pythonic/types/str.hpp"
 #include "pythonic/utils/proxy.hpp"
 
@@ -16,14 +18,16 @@ namespace pythonic
     namespace file
     {
 
-      void write(types::file &f, types::str const &str)
+      types::none_type write(types::file &f, types::str const &str)
       {
         f.write(str);
+        return __builtin__::None;
       }
 
-      void write(types::file &&f, types::str const &str)
+      types::none_type write(types::file &&f, types::str const &str)
       {
         f.write(str);
+        return __builtin__::None;
       }
 
       PROXY_IMPL(pythonic::__builtin__::file, write);

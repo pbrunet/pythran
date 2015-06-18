@@ -3,6 +3,7 @@
 
 #include "pythonic/include/utils/proxy.hpp"
 #include "pythonic/include/types/file.hpp"
+#include "pythonic/include/types/none.hpp"
 
 namespace pythonic
 {
@@ -13,10 +14,10 @@ namespace pythonic
     namespace file
     {
 
-      void seek(types::file &f, long offset);
-      void seek(types::file &&f, long offset);
-      void seek(types::file &f, long offset, long whence);
-      void seek(types::file &&f, long offset, long whence);
+      types::none_type seek(types::file &f, long offset);
+      types::none_type seek(types::file &&f, long offset);
+      types::none_type seek(types::file &f, long offset, long whence);
+      types::none_type seek(types::file &&f, long offset, long whence);
 
       PROXY_DECL(pythonic::__builtin__::file, seek);
     }

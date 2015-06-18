@@ -2,6 +2,7 @@
 #define PYTHONIC_INCLUDE_BUILTIN_FILE_WRITELINES_HPP
 
 #include "pythonic/include/types/file.hpp"
+#include "pythonic/include/types/none.hpp"
 #include "pythonic/include/utils/proxy.hpp"
 
 namespace pythonic
@@ -14,7 +15,7 @@ namespace pythonic
     {
 
       template <class F, class T>
-      void writelines(F &&f, T const &sequence);
+      types::none_type writelines(F &&f, T const &sequence);
 
       PROXY_DECL(pythonic::__builtin__::file, writelines);
     }

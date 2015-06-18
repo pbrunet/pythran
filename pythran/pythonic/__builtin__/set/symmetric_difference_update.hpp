@@ -3,6 +3,8 @@
 
 #include "pythonic/include/__builtin__/set/symmetric_difference_update.hpp"
 
+#include "pythonic/__builtin__/None.hpp"
+#include "pythonic/types/none.hpp"
 #include "pythonic/types/set.hpp"
 #include "pythonic/utils/proxy.hpp"
 
@@ -16,22 +18,27 @@ namespace pythonic
     {
 
       template <typename T, typename U>
-      void symmetric_difference_update(types::set<T> &set, U const &other)
+      types::none_type symmetric_difference_update(types::set<T> &set,
+                                                   U const &other)
       {
         set.symmetric_difference_update(other);
+        return __builtin__::None;
       }
 
       template <typename T, typename U>
-      void symmetric_difference_update(types::set<T> &&set, U const &other)
+      types::none_type symmetric_difference_update(types::set<T> &&set,
+                                                   U const &other)
       {
         // nothing to be done on rvalue
+        return __builtin__::None;
       }
 
       template <typename U>
-      void symmetric_difference_update(types::empty_set const &set,
-                                       U const &other)
+      types::none_type symmetric_difference_update(types::empty_set const &set,
+                                                   U const &other)
       {
         // nothing otherwise empty_set have not its correct type.
+        return __builtin__::None;
       }
 
       PROXY_IMPL(pythonic::__builtin__::set, symmetric_difference_update);
