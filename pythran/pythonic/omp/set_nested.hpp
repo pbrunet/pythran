@@ -3,8 +3,9 @@
 
 #include "pythonic/include/omp/set_nested.hpp"
 
-#include <omp.h>
 #include "pythonic/utils/proxy.hpp"
+
+#include <omp.h>
 
 namespace pythonic
 {

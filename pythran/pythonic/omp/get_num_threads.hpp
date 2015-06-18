@@ -3,8 +3,9 @@
 
 #include "pythonic/include/omp/get_num_threads.hpp"
 
-#include <omp.h>
 #include "pythonic/utils/proxy.hpp"
+
+#include <omp.h>
 
 namespace pythonic
 {

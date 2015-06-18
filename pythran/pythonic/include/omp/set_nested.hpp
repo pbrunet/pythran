@@ -1,8 +1,7 @@
 #ifndef PYTHONIC_INCLUDE_OMP_SET_NESTED_HPP
 #define PYTHONIC_INCLUDE_OMP_SET_NESTED_HPP
 
-#include <omp.h>
-#include "pythonic/utils/proxy.hpp"
+#include "pythonic/include/utils/proxy.hpp"
 
 namespace pythonic
 {
