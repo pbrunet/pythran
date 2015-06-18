@@ -3,8 +3,9 @@
 
 #include "pythonic/include/operator_/mul.hpp"
 
-#include "pythonic/utils/proxy.hpp"
 #include "pythonic/operator_/overloads.hpp"
+#include "pythonic/utils/proxy.hpp"
+
 #ifdef USE_BOOST_SIMD
 #include <nt2/include/functions/multiplies.hpp>
 #endif

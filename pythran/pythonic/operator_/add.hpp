@@ -3,8 +3,8 @@
 
 #include "pythonic/include/operator_/add.hpp"
 
-#include "pythonic/utils/proxy.hpp"
 #include "pythonic/operator_/overloads.hpp"
+#include "pythonic/utils/proxy.hpp"
 
 namespace pythonic
 {

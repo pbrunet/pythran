@@ -3,8 +3,8 @@
 
 #include "pythonic/include/operator_/imax.hpp"
 
-#include "pythonic/utils/proxy.hpp"
 #include "pythonic/numpy/maximum.hpp"
+#include "pythonic/utils/proxy.hpp"
 
 namespace pythonic
 {

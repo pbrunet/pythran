@@ -3,8 +3,8 @@
 
 #include "pythonic/include/operator_/contains.hpp"
 
-#include "pythonic/utils/proxy.hpp"
 #include "pythonic/__builtin__/in.hpp"
+#include "pythonic/utils/proxy.hpp"
 
 namespace pythonic
 {

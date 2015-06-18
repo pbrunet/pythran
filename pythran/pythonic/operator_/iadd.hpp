@@ -4,9 +4,6 @@
 #include "pythonic/include/operator_/iadd.hpp"
 
 #include "pythonic/utils/proxy.hpp"
-#include "pythonic/types/list.hpp"
-#include "pythonic/types/set.hpp"
-#include "pythonic/types/dict.hpp"
 
 namespace pythonic
 {
@@ -29,26 +26,6 @@ namespace pythonic
         return a += std::forward<B>(b);
       }
 
-      template <class A>
-      auto iadd::operator()(types::empty_list, types::list<A> const &b)
-          -> decltype(b)
-      {
-        return b;
-      }
-
-      template <class K, class V>
-      auto iadd::operator()(types::empty_dict, types::dict<K, V> const &b)
-          -> decltype(b)
-      {
-        return b;
-      }
-
-      template <class A>
-      auto iadd::operator()(types::empty_set, types::set<A> const &b)
-          -> decltype(b)
-      {
-        return b;
-      }
     }
 
     template <class A, class B>

@@ -3,8 +3,8 @@
 
 #include "pythonic/include/operator_/__abs__.hpp"
 
-#include "pythonic/utils/proxy.hpp"
 #include "pythonic/__builtin__/abs.hpp"
+#include "pythonic/utils/proxy.hpp"
 
 namespace pythonic
 {

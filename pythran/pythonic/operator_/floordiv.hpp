@@ -4,7 +4,6 @@
 #include "pythonic/include/operator_/floordiv.hpp"
 
 #include "pythonic/utils/proxy.hpp"
-#include <nt2/include/functions/divfloor.hpp>
 
 namespace pythonic
 {
@@ -13,7 +12,7 @@ namespace pythonic
   {
     long floordiv(long a, long b)
     {
-      return std::floor(static_cast<double>(a) / b);
+      return std::floor((double)a / b);
     }
     double floordiv(double a, long b)
     {
