@@ -25,7 +25,6 @@ namespace pythonic
       {
         return a += std::forward<B>(b);
       }
-
     }
 
     template <class A, class B>

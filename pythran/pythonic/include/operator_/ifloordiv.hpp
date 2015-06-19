@@ -10,7 +10,10 @@ namespace pythonic
   {
 
     template <class A, class B>
-    A ifloordiv(A & a, B b);
+    A ifloordiv(A &a, B b);
+
+    template <class A, class B>
+    A ifloordiv(A const &a, B b);
 
     PROXY_DECL(pythonic::operator_, ifloordiv);
   }

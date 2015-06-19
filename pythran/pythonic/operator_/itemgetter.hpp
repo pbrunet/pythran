@@ -3,76 +3,70 @@
 
 #include "pythonic/include/operator_/itemgetter.hpp"
 
-#include "pythonic/utils/proxy.hpp"
 #include "pythonic/types/tuple.hpp"
-#include "pythonic/utils/int_.hpp"
+#include "pythonic/utils/seq.hpp"
+#include "pythonic/utils/proxy.hpp"
 
 namespace pythonic
 {
 
   namespace operator_
   {
-
-    itemgetter_return::itemgetter_return(long const &item) : i(item)
+    namespace details
     {
+
+      template <class T>
+      itemgetter_return::itemgetter_return<T>(T const &item)
+          : i(item)
+      {
+      }
+
+      template <class T>
+      template <class A>
+      auto itemgetter_return<T>::operator()(A const &a) const -> decltype(a[i])
+      {
+        return a[i];
+      }
+
+      template <class T, size_t N>
+      template <class... Types>
+      itemgetter_tuple_return<T, N>::itemgetter_tuple_return(Types... &&items)
+          : items(std::forward<Types>(items)...)
+      {
+      }
+
+      template <typename T, size_t N>
+      template <int... I>
+      auto itemgetter_tuple_return<T, N>::helper(utils::seq<I...>) const
+          -> decltype(types::make_tuple(a[std::get<I>(items)]...))
+      {
+        return types::make_tuple(a[std::get<I>(items)]...);
+      }
+
+      template <typename T, size_t N>
+      template <class A>
+      auto itemgetter_tuple_return<T, N>::operator()(A const &a) const
+          -> decltype(helper(utils::gens<N>::type{}))
+      {
+        return helper(utils::gens<N>::type{});
+      }
     }
 
-    template <class A>
-    auto itemgetter_return::operator()(A const &a) const -> decltype(a[i])
+    template <class T>
+    itemgetter_return<
+        typename std::remove_cv<typename std::remove_reference<T>::type>::type>
+    itemgetter(T &&item)
     {
-      return a[i];
+      return {std::forward<T>(item)};
     }
 
-    itemgetter_return itemgetter(long item)
+    template <class T1, class T2, class... L>
+    details::itemgetter_tuple_return<
+        typename std::remove_cv<typename std::remove_reference<T>::type>::type>,
+        sizeof...(L) + 2 > itemgetter(T1 &&item1, T2 &&item2, L... items)
     {
-      return itemgetter_return(item);
-    }
-
-    template <typename... Types>
-    itemgetter_tuple_return<Types...>::itemgetter_tuple_return(Types... items)
-        : items(items...)
-    {
-    }
-
-    template <typename... Types>
-    itemgetter_tuple_return<Types...>::itemgetter_tuple_return()
-    {
-    }
-
-    template <typename... Types>
-    template <class T, class A, size_t I>
-    void itemgetter_tuple_return<Types...>::helper(T &t, A const &a,
-                                                   utils::int_<I>) const
-    {
-      std::get<I>(t) = a[std::get<I>(items)];
-      helper(t, a, utils::int_<I - 1>());
-    }
-
-    template <typename... Types>
-    template <class T, class A>
-    void itemgetter_tuple_return<Types...>::helper(T &t, A const &a,
-                                                   utils::int_<0>) const
-    {
-      std::get<0>(t) = a[std::get<0>(items)];
-    }
-
-    template <typename... Types>
-    template <class A>
-    auto itemgetter_tuple_return<Types...>::operator()(A const &a) const
-        -> std::tuple<typename std::remove_cv<typename std::remove_reference<
-            decltype(a[std::declval<Types>()])>::type>::type...>
-    {
-      std::tuple<typename std::remove_cv<typename std::remove_reference<
-          decltype(a[std::declval<Types>()])>::type>::type...> t;
-      helper(t, a, utils::int_<sizeof...(Types)-1>());
-      return t;
-    }
-
-    template <class... L>
-    itemgetter_tuple_return<long, long, L...>
-    itemgetter(long const &item1, long const &item2, L... items)
-    {
-      return {item1, item2, items...};
+      return {std::forward<T1>(item1), std::forward<T2>(item2),
+              std::forward<L>(items)...};
     }
 
     PROXY_IMPL(pythonic::operator_, itemgetter);

@@ -12,9 +12,15 @@ namespace pythonic
   {
 
     template <class A, class B>
-    A ifloordiv(A & a, B b)
+    A ifloordiv(A &a, B b)
     {
-      return a = std::floor((double)a/b);
+      return a = std::floor((double)a / b);
+    }
+
+    template <class A, class B>
+    A ifloordiv(A const &a, B b)
+    {
+      return std::floor((double)a / b);
     }
 
     PROXY_IMPL(pythonic::operator_, ifloordiv);

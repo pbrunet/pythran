@@ -11,7 +11,7 @@ namespace pythonic
 
   namespace math
   {
-    std::tuple<double, double> modf(double x);
+    types::array<double, 2> modf(double x);
     PROXY_DECL(pythonic::math, modf);
   }
 }
