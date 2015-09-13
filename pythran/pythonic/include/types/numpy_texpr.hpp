@@ -2,6 +2,7 @@
 #define PYTHONIC_INCLUDE_TYPES_NUMPY_TEXPR_HPP
 
 #include "pythonic/include/types/ndarray.hpp"
+#include "pythonic/include/__builtin__/None.hpp"
 
 namespace pythonic
 {
