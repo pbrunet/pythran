@@ -179,6 +179,10 @@ namespace pythonic
       template <size_t M>
       bool operator==(array<T, M> const &other) const;
 
+      template <class U, U u, size_t M>
+        typename std::enable_if<std::is_same<T, U>::value, bool>::type
+        operator==(array<std::integral_constant<U, u>, M> const &other) const;
+
       template <size_t M>
       bool operator<(array<T, M> const &other) const;
 
@@ -219,6 +223,24 @@ namespace pythonic
         static bool const value = false;
         using type = void;
       };
+
+      template <class T, T v>
+        struct alike<std::integral_constant<T, v>, T> : public std::true_type
+        {
+          using type = T;
+        };
+
+      template <class T, T v>
+        struct alike<T, std::integral_constant<T, v>> : public std::true_type
+        {
+          using type = T;
+        };
+
+      template <class T, T v1, T v2>
+        struct alike<std::integral_constant<T, v1>, std::integral_constant<T, v2>> : public std::true_type
+        {
+          using type = T;
+        };
 
       template <class T>
       struct alike<T> {

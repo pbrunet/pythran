@@ -18,7 +18,7 @@ from pythran.openmp import OMPDirective
 from pythran.passmanager import Backend
 from pythran.syntax import PythranSyntaxError
 from pythran.tables import operator_to_lambda, MODULES, pythran_ward
-from pythran.types.conversion import PYTYPE_TO_CTYPE_TABLE, TYPE_TO_SUFFIX
+from pythran.types.conversion import PYTYPE_TO_CTYPE_TABLE
 from pythran.types.types import Types
 from pythran import metadata, unparse
 
@@ -1188,8 +1188,10 @@ pythonic::types::none_type>::type result_type;
             return 'pythonic::numpy::nan'
         elif isinf(node.n):
             return ('+' if node.n > 0 else '-') + 'pythonic::numpy::inf'
+        elif isinstance(node.n, float):
+            return repr(node.n)
         else:
-            return repr(node.n) + TYPE_TO_SUFFIX.get(type(node.n), "")
+            return "std::integral_constant<long, " + repr(node.n) + ">()"
 
     def visit_Str(self, node):
         quoted = node.s.replace('"', '\\"').replace('\n', '\\n"\n"')

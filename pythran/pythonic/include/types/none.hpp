@@ -25,15 +25,15 @@ namespace pythonic
      *
      * see http://en.wikipedia.org/wiki/Option_type
      */
-    template <class T>
+    template <class T, bool not_int = not std::is_integral<T>::value>
     struct none : T {
 
       bool is_none; // set to true if the type is none
 
       none(none_type const &);
 
-      template <class... Types>
-      none(Types &&... args);
+      template <class Types>
+      none(Types &&args);
 
       bool operator==(none_type const &) const;
 
@@ -45,89 +45,186 @@ namespace pythonic
       intptr_t id() const;
     };
 
-/* specialization of none for integral types we cannot derive from
-*/
-#define SPECIALIZE_NONE_DECL(T)                                                \
-  template <>                                                                  \
-  class none<T>                                                                \
-  {                                                                            \
-    T data;                                                                    \
-    friend std::ostream &operator<<(std::ostream &, none<T> const &);          \
-    friend T operator+(none<T> const &t0, T const &t1);                        \
-    friend T operator+(T const &t0, none<T> const &t1);                        \
-    friend none<T> operator+(none<T> const &t0, none<T> const &t1);            \
-    friend bool operator>(none<T> const &t0, T const &t1);                     \
-    friend bool operator>(T const &t0, none<T> const &t1);                     \
-    friend none<bool> operator>(none<T> const &t0, none<T> const &t1);         \
-    friend bool operator>=(none<T> const &t0, T const &t1);                    \
-    friend bool operator>=(T const &t0, none<T> const &t1);                    \
-    friend none<bool> operator>=(none<T> const &t0, none<T> const &t1);        \
-    friend bool operator<(none<T> const &t0, T const &t1);                     \
-    friend bool operator<(T const &t0, none<T> const &t1);                     \
-    friend none<bool> operator<(none<T> const &t0, none<T> const &t1);         \
-    friend bool operator<=(none<T> const &t0, T const &t1);                    \
-    friend bool operator<=(T const &t0, none<T> const &t1);                    \
-    friend none<bool> operator<=(none<T> const &t0, none<T> const &t1);        \
-    friend T operator-(none<T> const &t0, T const &t1);                        \
-    friend T operator-(T const &t0, none<T> const &t1);                        \
-    friend none<T> operator-(none<T> const &t0, none<T> const &t1);            \
-    friend T operator*(none<T> const &t0, T const &t1);                        \
-    friend T operator*(T const &t0, none<T> const &t1);                        \
-    friend none<T> operator*(none<T> const &t0, none<T> const &t1);            \
-    friend T operator/(none<T> const &t0, T const &t1);                        \
-    friend T operator/(T const &t0, none<T> const &t1);                        \
-    friend none<T> operator/(none<T> const &t0, none<T> const &t1);            \
-                                                                               \
-  public:                                                                      \
-    bool is_none;                                                              \
-    none();                                                                    \
-    none(none_type const &);                                                   \
-    none(T const &data);                                                       \
-    bool operator==(none_type const &) const;                                  \
-    template <class O>                                                         \
-    bool operator==(O const &t) const;                                         \
-    operator bool() const;                                                     \
-    operator size_t() const;                                                   \
-    operator long() const;                                                     \
-    operator long long() const;                                                \
-    operator double() const;                                                   \
-    T &operator=(T const &t);                                                  \
-    intptr_t id() const;                                                       \
-  };                                                                           \
-  T operator+(none<T> const &t0, T const &t1);                                 \
-  T operator+(T const &t0, none<T> const &t1);                                 \
-  none<T> operator+(none<T> const &t0, none<T> const &t1);                     \
-  bool operator>(none<T> const &t0, T const &t1);                              \
-  bool operator>(T const &t0, none<T> const &t1);                              \
-  none<bool> operator>(none<T> const &t0, none<T> const &t1);                  \
-  bool operator>=(none<T> const &t0, T const &t1);                             \
-  bool operator>=(T const &t0, none<T> const &t1);                             \
-  none<bool> operator>=(none<T> const &t0, none<T> const &t1);                 \
-  bool operator<(none<T> const &t0, T const &t1);                              \
-  bool operator<(T const &t0, none<T> const &t1);                              \
-  none<bool> operator<(none<T> const &t0, none<T> const &t1);                  \
-  bool operator<=(none<T> const &t0, T const &t1);                             \
-  bool operator<=(T const &t0, none<T> const &t1);                             \
-  none<bool> operator<=(none<T> const &t0, none<T> const &t1);                 \
-  T operator-(none<T> const &t0, T const &t1);                                 \
-  T operator-(T const &t0, none<T> const &t1);                                 \
-  none<T> operator-(none<T> const &t0, none<T> const &t1);                     \
-  T operator*(none<T> const &t0, T const &t1);                                 \
-  T operator*(T const &t0, none<T> const &t1);                                 \
-  none<T> operator*(none<T> const &t0, none<T> const &t1);                     \
-  T operator/(none<T> const &t0, T const &t1);                                 \
-  T operator/(T const &t0, none<T> const &t1);                                 \
-  none<T> operator/(none<T> const &t0, none<T> const &t1);                     \
-  std::ostream &operator<<(std::ostream &os, none<T> const &v);
+    /* specialization of none for integral types we cannot derive from
+    */
+    template <class T>
+    class none<T, false>
+    {
+      T data;
+      template <class T1>
+      friend std::ostream &operator<<(std::ostream &, none<T1, false> const &);
 
-    SPECIALIZE_NONE_DECL(bool);
-    SPECIALIZE_NONE_DECL(size_t);
-    SPECIALIZE_NONE_DECL(long);
-    SPECIALIZE_NONE_DECL(int);
-    SPECIALIZE_NONE_DECL(long long);
-    SPECIALIZE_NONE_DECL(double);
+      template <class T1>
+      friend T1 operator+(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend T1 operator+(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<T1> operator+(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend bool operator>(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend bool operator>(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<bool> operator>(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend bool operator>=(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend bool operator>=(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<bool> operator>=(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend bool operator<(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend bool operator<(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<bool> operator<(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend bool operator<=(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend bool operator<=(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<bool> operator<=(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend T1 operator-(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend T1 operator-(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<T1, false> operator-(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend T1 operator*(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend T1 operator*(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<T1, false> operator*(none<T1, false> const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend T1 operator/(none<T1, false> const &t0, T1 const &t1);
+
+      template <class T1>
+      friend T1 operator/(T1 const &t0, none<T1, false> const &t1);
+
+      template <class T1>
+      friend none<T1, false> operator/(none<T1, false> const &t0, none<T1, false> const &t1);
+
+    public:
+      bool is_none;
+      none();
+      none(none_type const &);
+      none(T const &data);
+      template <T t>
+      none(std::integral_constant<T, t> args);
+      bool operator==(none_type const &) const;
+      template <class O>
+      bool operator==(O const &t) const;
+      operator bool() const;
+      operator size_t() const;
+      operator long() const;
+      operator long long() const;
+      operator double() const;
+      T &operator=(T const &t);
+      intptr_t id() const;
+    };
 
     template <class T>
+    T operator+(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    T operator+(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<T, false> operator+(none<T, false> const &t0,
+                             none<T, false> const &t1);
+
+    template <class T>
+    bool operator>(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    bool operator>(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<bool> operator>(none<T, false> const &t0, none<T, false> const &t1);
+
+    template <class T>
+    bool operator>=(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    bool operator>=(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<bool> operator>=(none<T, false> const &t0, none<T, false> const &t1);
+
+    template <class T>
+    bool operator<(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    bool operator<(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<bool> operator<(none<T, false> const &t0, none<T, false> const &t1);
+
+    template <class T>
+    bool operator<=(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    bool operator<=(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<bool> operator<=(none<T, false> const &t0, none<T, false> const &t1);
+
+    template <class T>
+    T operator-(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    T operator-(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<T, false> operator-(none<T, false> const &t0,
+                             none<T, false> const &t1);
+
+    template <class T>
+    T operator*(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    T operator*(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<T, false> operator*(none<T, false> const &t0,
+                             none<T, false> const &t1);
+
+    template <class T>
+    T operator/(none<T, false> const &t0, T const &t1);
+
+    template <class T>
+    T operator/(T const &t0, none<T, false> const &t1);
+
+    template <class T>
+    none<T, false> operator/(none<T, false> const &t0,
+                             none<T, false> const &t1);
+
+    template <class T>
+    std::ostream &operator<<(std::ostream &os, none<T, false> const &v);
+
+    template <class T, bool b>
     struct none;
 
     template <class T>

@@ -25,11 +25,6 @@ PYTYPE_TO_CTYPE_TABLE = {
     complex128: 'std::complex<double>',
 }
 
-TYPE_TO_SUFFIX = {
-    int: "L",
-    long: "LL",
-    }
-
 
 def pytype_to_ctype(t):
     """ Python -> pythonic type binding. """

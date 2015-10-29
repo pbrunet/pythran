@@ -9,6 +9,34 @@ namespace pythonic
   namespace types
   {
 
+    /**
+     * is_fundamental
+     */
+
+    template <class T>
+      struct is_fundamental : std::is_fundamental<T>
+    {};
+
+    template <class T, T v>
+      struct is_fundamental<std::integral_constant<T, v>> : std::true_type
+      {};
+
+    /**
+     * is_integer
+     */
+
+    template <class T>
+      struct is_integral : std::is_integral<T>
+    {};
+
+    template <class T, T v>
+      struct is_integral<std::integral_constant<T, v>> : std::true_type
+      {};
+
+    /**
+     * is_complex
+     */
+
     template <class T>
     struct is_complex : std::false_type {
       using type = T;
@@ -22,7 +50,7 @@ namespace pythonic
     template <class T>
     struct is_dtype {
       static constexpr bool value =
-          std::is_scalar<T>::value or is_complex<T>::value;
+          std::is_scalar<T>::value or is_complex<T>::value or types::is_integral<T>::value;
     };
 
 #define MEMBER_TYPE_TRAIT(check_struct, member)                                \

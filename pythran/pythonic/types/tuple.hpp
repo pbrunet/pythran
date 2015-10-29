@@ -349,6 +349,14 @@ namespace pythonic
     }
 
     template <typename T, size_t N>
+    template <class U, U u, size_t M>
+    typename std::enable_if<std::is_same<T, U>::value, bool>::type
+    array<T, N>::operator==(array<std::integral_constant<U, u>, M> const &other) const
+    {
+      return N == M and std::equal(begin(), end(), other.begin());
+    }
+
+    template <typename T, size_t N>
     template <size_t M>
     bool array<T, N>::operator<(array<T, M> const &other) const
     {

@@ -26,6 +26,11 @@ namespace pythonic
   PyObject *to_python<TYPE>::convert(TYPE l)                                   \
   {                                                                            \
     return PyInt_FromLong(l);                                                  \
+  }\
+  template <TYPE v>\
+  PyObject *to_python<std::integral_constant<TYPE, v>>::convert(std::integral_constant<TYPE, v>)                                   \
+  {                                                                            \
+    return PyInt_FromLong(v);                                                  \
   }
 
   PYTHONIC_INT_TO_PYTHON(unsigned char)

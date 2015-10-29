@@ -435,7 +435,10 @@ class Types(ModuleAnalysis):
         It could be int, long or float so we use the default python to pythonic
         type converter.
         """
-        self.result[node] = NamedType(PYTYPE_TO_CTYPE_TABLE[type(node.n)])
+        if isinstance(node.n, int):
+            self.result[node] = NamedType("std::integral_constant<{}, {}>".format(PYTYPE_TO_CTYPE_TABLE[type(node.n)], repr(node.n)))
+        else:
+            self.result[node] = NamedType(PYTYPE_TO_CTYPE_TABLE[type(node.n)])
 
     def visit_Str(self, node):
         """ Set the pythonic string type. """

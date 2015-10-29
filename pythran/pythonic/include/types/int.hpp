@@ -15,7 +15,11 @@ namespace pythonic
   template <>                                                                  \
   struct to_python<TYPE> {                                                     \
     static PyObject *convert(TYPE l);                                          \
-  }
+  };                                                                            \
+  template <TYPE v>                                                            \
+  struct to_python<std::integral_constant<TYPE, v>> {                          \
+    static PyObject *convert(std::integral_constant<TYPE, v>);                 \
+  };
 
   PYTHONIC_INT_TO_PYTHON(unsigned char);
   PYTHONIC_INT_TO_PYTHON(signed char);

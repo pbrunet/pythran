@@ -20,8 +20,7 @@ namespace pythonic
     template <class T>
     struct all_valid_arg<T> {
       static constexpr bool value =
-          (is_numexpr_arg<T>::value or is_complex<T>::value or
-           std::is_scalar<T>::value);
+          (is_numexpr_arg<T>::value or types::is_dtype<T>::value);
     };
 
     template <class T0, class... Types>
