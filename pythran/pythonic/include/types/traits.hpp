@@ -69,6 +69,9 @@ namespace pythonic
     /* trait to check if the type has a size member */
     MEMBER_ATTR_TRAIT(has_size, size);
 
+    /* trait to check if the type has a size member */
+    MEMBER_ATTR_TRAIT(has_flat_size, flat_size);
+
     /* trait to check if the type has a contains member */
     template <typename T, class V>
     struct has_contains {

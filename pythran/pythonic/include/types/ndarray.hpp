@@ -4,6 +4,7 @@
 #include "pythonic/include/types/assignable.hpp"
 #include "pythonic/include/types/empty_iterator.hpp"
 #include "pythonic/include/types/attr.hpp"
+#include "pythonic/include/types/array_base.hpp"
 
 #include "pythonic/include/utils/nested_container.hpp"
 #include "pythonic/include/utils/shared_ref.hpp"
@@ -194,7 +195,7 @@ namespace pythonic
      *
      */
     template <class T, size_t N>
-    struct ndarray {
+    struct ndarray : public ArrayLike<ndarray<T, N>> {
       static const bool is_vectorizable = types::is_vectorizable<T>::value;
       static const bool is_strided = false;
 
