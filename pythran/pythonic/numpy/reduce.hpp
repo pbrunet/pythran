@@ -23,22 +23,19 @@ namespace pythonic
     template <class Op, size_t N, bool vector_form>
     struct _reduce {
       template <class E, class F>
-      F operator()(E e, F acc)
+      F operator()(E const &e, F const &acc)
       {
-        for (auto const &value : e)
-          acc = _reduce<Op, N - 1, vector_form>{}(value, acc);
-        return acc;
+        return std::accumulate(e.begin(), e.end(), acc,
+                               _reduce<Op, N - 1, vector_form>{});
       }
     };
 
     template <class Op, bool vector_form>
     struct _reduce<Op, 1, vector_form> {
       template <class E, class F>
-      F operator()(E e, F acc)
+      F operator()(E const &e, F const &acc)
       {
-        for (auto const &value : e)
-          Op{}(acc, value);
-        return acc;
+        return std::accumulate(e.begin(), e.end(), acc, Op{});
       }
     };
 
@@ -46,7 +43,7 @@ namespace pythonic
     template <class Op>
     struct _reduce<Op, 1, true> {
       template <class E, class F>
-      F operator()(E e, F acc)
+      F operator()(E const &e, F const &acc)
       {
         using T = typename E::dtype;
         using vT =
