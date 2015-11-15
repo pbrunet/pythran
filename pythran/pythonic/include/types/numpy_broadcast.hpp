@@ -7,8 +7,9 @@
 #include <boost/simd/include/functions/store.hpp>
 #endif
 
-#include "pythonic/include/types/vectorizable_type.hpp"
+#include "pythonic/include/types/array_base.hpp"
 #include "pythonic/include/types/tuple.hpp"
+#include "pythonic/include/types/vectorizable_type.hpp"
 
 namespace pythonic
 {
@@ -48,6 +49,9 @@ namespace pythonic
           -> decltype(ref(std::forward<Args>(args)...));
 
       long flat_size() const;
+
+      static_assert(ArrayLike<broadcasted>::value,
+                    "broadcasted is not an array Like");
     };
 
     /* Type adaptor for scalar values
@@ -168,6 +172,10 @@ namespace pythonic
       template <class... Args>
       dtype operator()(Args &&...) const;
       long flat_size() const;
+      static constexpr types::array<long, 0> shape()
+      {
+        return {};
+      }
       iterator begin() const
       {
         return {_base._value};
@@ -176,6 +184,9 @@ namespace pythonic
       {
         return {_base._value};
       }
+
+      static_assert(ArrayLike<broadcast>::value,
+                    "broadcast is not an array Like");
     };
   }
 }

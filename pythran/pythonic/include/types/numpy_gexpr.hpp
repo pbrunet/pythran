@@ -2,6 +2,8 @@
 #define PYTHONIC_INCLUDE_TYPES_NUMPY_GEXPR_HPP
 
 #include "pythonic/include/utils/meta.hpp"
+#include "pythonic/include/types/array_base.hpp"
+
 #ifdef USE_BOOST_SIMD
 #include <boost/simd/sdk/simd/native.hpp>
 #include <boost/simd/include/functions/store.hpp>
@@ -554,6 +556,9 @@ namespace pythonic
       operator[](F const &filter) const;
 
       long flat_size() const;
+
+      static_assert(ArrayLike<numpy_gexpr>::value,
+                    "numpy_gexpr is not an array Like");
     };
 
     // As gexpr has to begin with a slice. When we access it, we need to forward

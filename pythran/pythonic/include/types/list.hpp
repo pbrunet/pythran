@@ -8,6 +8,7 @@
 #include "pythonic/include/utils/int_.hpp"
 #include "pythonic/include/utils/reserve.hpp"
 #include "pythonic/include/types/slice.hpp"
+#include "pythonic/include/types/array_base.hpp"
 
 #include <iostream>
 #include <vector>
@@ -122,6 +123,9 @@ namespace pythonic
       template <class K>
       bool operator==(list<K> const &other) const;
       bool operator==(empty_list const &other) const;
+
+      static_assert(ArrayLike<sliced_list<T, S>>::value,
+                    "Sliced list is not an array Like");
     };
 
     /* list */
@@ -287,13 +291,18 @@ namespace pythonic
 
       long count(T const &x) const;
       array<long, value> shape() const;
+      static_assert(ArrayLike<list<T>>::value, "List is not an array Like");
     };
 
     /* empty list implementation */
     struct empty_list {
-      typedef void value_type;
-      typedef empty_iterator iterator;
-      typedef empty_iterator const_iterator;
+      using value_type = void;
+      using dtype = void;
+      using iterator = empty_iterator;
+      using const_iterator = empty_iterator;
+      static constexpr bool is_strided = false;
+      static constexpr bool is_vectorizable = true;
+
       template <class T>
       list<T> operator+(list<T> const &s) const;
       template <class T, class S>
@@ -303,6 +312,23 @@ namespace pythonic
       template <class T>
       operator list<T>() const;
       static constexpr long size();
+      static constexpr long flat_size();
+      static constexpr types::array<long, 0> shape()
+      {
+        return {};
+      }
+      // Can't return void as it is a constexpr
+      static constexpr bool fast()
+      {
+        return false;
+      }
+      static constexpr bool may_overlap()
+      {
+        return false;
+      }
+
+      static_assert(ArrayLike<empty_list>::value,
+                    "empty_list is not an array Like");
     };
 
     std::ostream &operator<<(std::ostream &os, empty_list const &);

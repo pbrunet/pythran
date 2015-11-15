@@ -2,6 +2,7 @@
 #define PYTHONIC_INCLUDE_TYPES_NUMPY_FEXPR_HPP
 
 #include "pythonic/include/types/nditerator.hpp"
+#include "pythonic/include/types/array_base.hpp"
 
 namespace pythonic
 {
@@ -117,6 +118,9 @@ namespace pythonic
       operator[](E const &expr) const;
 
       long flat_size() const;
+
+      static_assert(ArrayLike<numpy_fexpr>::value,
+                    "numpy_fexpr is not an array Like");
     };
   }
 

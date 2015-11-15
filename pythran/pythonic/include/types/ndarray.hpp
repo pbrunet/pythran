@@ -195,7 +195,7 @@ namespace pythonic
      *
      */
     template <class T, size_t N>
-    struct ndarray : public ArrayLike<ndarray<T, N>> {
+    struct ndarray {
       static const bool is_vectorizable = types::is_vectorizable<T>::value;
       static const bool is_strided = false;
 
@@ -413,6 +413,9 @@ namespace pythonic
       ndarray<T, N> copy() const;
       intptr_t id() const;
       array<long, N> const &shape() const;
+
+      static_assert(ArrayLike<ndarray<T, N>>::value,
+                    "ndarray is not an array Like");
     };
 
     /* pretty printing { */

@@ -2,6 +2,7 @@
 #define PYTHONIC_INCLUDE_TYPES_NUMPY_EXPR_HPP
 
 #include "pythonic/include/utils/meta.hpp"
+#include "pythonic/include/types/array_base.hpp"
 
 namespace pythonic
 {
@@ -100,6 +101,9 @@ namespace pythonic
       long flat_size() const;
 
       long size() const;
+
+      static_assert(ArrayLike<numpy_expr>::value,
+                    "numpyexpr is not an array Like");
     };
   }
 

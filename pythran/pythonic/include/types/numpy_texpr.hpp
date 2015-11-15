@@ -3,6 +3,7 @@
 
 #include "pythonic/include/types/ndarray.hpp"
 #include "pythonic/include/__builtin__/None.hpp"
+#include "pythonic/include/types/array_base.hpp"
 
 namespace pythonic
 {
@@ -125,6 +126,9 @@ namespace pythonic
       numpy_texpr(numpy_texpr &&) = default;
 
       numpy_texpr(ndarray<T, 2> const &arg);
+
+      static_assert(ArrayLike<numpy_texpr>::value,
+                    "numpy_texpr is not an array Like");
     };
 
     template <class E, class... S>

@@ -3,6 +3,7 @@
 
 #include "pythonic/include/types/nditerator.hpp"
 #include "pythonic/include/types/tuple.hpp"
+#include "pythonic/include/types/array_base.hpp"
 
 #ifdef USE_BOOST_SIMD
 #include <boost/simd/sdk/simd/native.hpp>
@@ -206,6 +207,9 @@ namespace pythonic
 
       template <size_t N>
       long buffer_offset(long index, utils::int_<N>);
+
+      static_assert(ArrayLike<numpy_iexpr>::value,
+                    "numpy_iexpr is not an array Like");
     };
 
     // Indexing an numpy_iexpr that has a dimension greater than one yields a

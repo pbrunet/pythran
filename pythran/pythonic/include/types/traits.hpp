@@ -72,6 +72,24 @@ namespace pythonic
     /* trait to check if the type has a size member */
     MEMBER_ATTR_TRAIT(has_flat_size, flat_size);
 
+    /* trait to check if the type has a size member */
+    MEMBER_ATTR_TRAIT(has_flat, flat);
+
+    /* trait to check if the type has a size member */
+    MEMBER_ATTR_TRAIT(has_overlap, may_overlap);
+
+    /* trait to check if the type has a size member */
+    MEMBER_ATTR_TRAIT(has_fast, fast);
+
+    /* trait to check if the type has a size member */
+    MEMBER_ATTR_TRAIT(has_vectorizable, is_vectorizable);
+
+    /* trait to check if the type has a size member */
+    MEMBER_TYPE_TRAIT(has_dtype, dtype);
+
+    /* trait to check if the type has a size member */
+    MEMBER_ATTR_TRAIT(has_strided, is_strided);
+
     /* trait to check if the type has a contains member */
     template <typename T, class V>
     struct has_contains {

@@ -627,6 +627,11 @@ namespace pythonic
       return 0;
     }
 
+    constexpr long empty_list::flat_size()
+    {
+      return 0;
+    }
+
     std::ostream &operator<<(std::ostream &os, empty_list const &)
     {
       return os << "[]";
