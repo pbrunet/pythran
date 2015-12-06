@@ -155,7 +155,7 @@ class Check(NodeVisitor):
         """
         return (isinstance(pattern, type(self.node)) and
                 all(self.field_match(value, getattr(pattern, field))
-                    for field, value in iter_fields(self.node)))
+                    for field, value in iter_fields(self.node) if field != "metadata"))
 
 
 class ASTMatcher(NodeVisitor):

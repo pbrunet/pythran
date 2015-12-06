@@ -42,6 +42,7 @@ class Python(Backend):
 
     def __init__(self):
         self.result = ''
+        self.update = False
         super(Python, self).__init__()
 
     def visit(self, node):

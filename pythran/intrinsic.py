@@ -46,6 +46,7 @@ class Intrinsic(object):
         self.global_effects = kwargs.get('global_effects', False)
         self.return_alias = kwargs.get('return_alias', lambda x: {NewMem()})
         self.return_type = kwargs.get('return_type', None)
+        self.type = kwargs.get('type', None)
         self.args = ast.arguments([ast.Name(n, ast.Param())
                                    for n in kwargs.get('args', [])],
                                   None, None,

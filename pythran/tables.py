@@ -17,6 +17,7 @@ from pythran.intrinsic import ReadEffect, ConstantIntr
 from pythran.intrinsic import ReadOnceFunctionIntr, ConstExceptionIntr
 from pythran.types.conversion import PYTYPE_TO_CTYPE_TABLE
 from pythran import range as prange
+import pythran.metadata as md
 
 logger = logging.getLogger("pythran")
 
@@ -337,7 +338,8 @@ MODULES = {
         "file": ClassWithConstConstructor(CLASSES['file']),
         "filter": ReadOnceFunctionIntr(),
         "float_": ClassWithConstConstructor(CLASSES['float']),
-        "getattr": ConstFunctionIntr(),
+        "getattr": ConstFunctionIntr( type=md.TFun(md.TLong,
+                                                   md.TArray(md.TLong), md.TVar("Int"))),
         "hex": ConstFunctionIntr(),
         "id": ConstFunctionIntr(),
         "int_": ConstFunctionIntr(),
@@ -353,7 +355,9 @@ MODULES = {
         "ord": ConstFunctionIntr(return_range=prange.ord_values),
         "open": ConstFunctionIntr(),
         "pow": ConstFunctionIntr(),
-        "range": ConstFunctionIntr(return_range_content=prange.range_values),
+        "range": ConstFunctionIntr(return_range_content=prange.range_values,
+                                   type=md.TFun(md.TList(md.TLong),
+                                                md.TLong, md.TLong, md.TLong)),
         "reduce": ReadOnceFunctionIntr(),
         "reversed": ReadOnceFunctionIntr(),
         "round": ConstFunctionIntr(),
@@ -362,10 +366,12 @@ MODULES = {
         "str": ClassWithConstConstructor(CLASSES['str']),
         "sum": ReadOnceFunctionIntr(),
         "tuple": ReadOnceFunctionIntr(),
-        "xrange": ConstFunctionIntr(return_range_content=prange.range_values),
+        "xrange": ConstFunctionIntr(return_range_content=prange.range_values,
+                                   type=md.TFun(md.TContainer(md.TLong),
+                                                md.TVar("Int"), md.TVar("Int"), md.TVar("Int"))),
         "zip": ReadOnceFunctionIntr(),
         "False": ConstantIntr(return_range=lambda args: prange.Range(0, 0)),
-        "None": ConstantIntr(),
+        "None": ConstantIntr(type=md.TNone()),
         "True": ConstantIntr(return_range=lambda args: prange.Range(1, 1)),
         },
     "numpy": {
@@ -616,9 +622,9 @@ MODULES = {
         "spacing": ConstFunctionIntr(),
         "split": ConstFunctionIntr(),
         "sqrt": ConstFunctionIntr(),
-        "square": ConstFunctionIntr(),
+        "square": ConstFunctionIntr(type=md.TFun(md.TVar("Int"), md.TVar("Int"))),
         "subtract": ConstFunctionIntr(),
-        "sum": ConstMethodIntr(),
+        "sum": ConstMethodIntr(type=md.TFun(md.TArray(md.TLong), md.TVar("Int"))),
         "swapaxes": ConstMethodIntr(),
         "take": ConstFunctionIntr(),
         "tan": ConstFunctionIntr(),
@@ -642,7 +648,9 @@ MODULES = {
         "var": ConstMethodIntr(),
         "where": ConstFunctionIntr(),
         "zeros": ConstFunctionIntr(args=('shape', 'dtype'),
-                                   defaults=("numpy.float64",)),
+                                   defaults=("numpy.float64",),
+                                   type=md.TFun(md.TArray(md.TLong),
+                                                md.TTuple(md.TLong))),
         "zeros_like": ConstFunctionIntr(),
         },
     "time": {

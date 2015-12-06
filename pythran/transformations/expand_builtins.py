@@ -26,6 +26,11 @@ class ExpandBuiltins(Transformation):
     def __init__(self):
         Transformation.__init__(self, Locals, Globals)
 
+    def visit_Module(self, node):
+        node = self.generic_visit(node)
+        node.body = [ast.Import([ast.alias("__builtin__", None)])] + node.body
+        return node
+
     def visit_Name(self, node):
         s = node.id
         if(isinstance(node.ctx, ast.Load) and

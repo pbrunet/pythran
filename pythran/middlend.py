@@ -9,6 +9,10 @@ from pythran.transformations import (ExpandBuiltins, ExpandImports,
                                      RemoveNestedFunctions, RemoveLambdas,
                                      UnshadowParameters, RemoveNamedArguments)
 
+from pythran.lala import TypingTest
+from pythran.backend import Python
+from pythran.types.reorder import Reorder
+
 
 def refine(pm, node, optimizations):
     """ Refine node in place until it matches pythran's expectations. """
@@ -45,3 +49,7 @@ def refine(pm, node, optimizations):
         apply_optimisation = False
         for optimization in optimizations:
             apply_optimisation |= pm.apply(optimization, node)[0]
+
+    pm.apply(Reorder, node)
+    pm.apply(Python, node)
+    pm.apply(TypingTest, node)

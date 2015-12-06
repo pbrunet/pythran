@@ -100,7 +100,7 @@ def run():
     if args.verbose:
         logger.setLevel(logging.INFO)
 
-    try:
+    if True:
         if not os.path.exists(args.input_file):
             raise ValueError("input file `{0}' not found".format(
                 args.input_file))
@@ -127,6 +127,8 @@ def run():
                                         cpponly=args.translate_only,
                                         **compile_flags(args))
 
+    try:
+        pass
     except IOError as e:
         logger.critical("I've got a bad feeling about this...\n"
                         "E: " + str(e))

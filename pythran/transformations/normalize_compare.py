@@ -16,8 +16,6 @@ class NormalizeCompare(Transformation):
     >>> pm = passmanager.PassManager("test")
     >>> _, node = pm.apply(NormalizeCompare, node)
     >>> print pm.dump(backend.Python, node)
-    def foo(a):
-        return foo_compare0(a)
     def foo_compare0(a):
         $0 = 0
         $1 = (a + 1)
@@ -31,13 +29,22 @@ class NormalizeCompare(Transformation):
         else:
             return 0
         return 1
+    def foo(a):
+        return foo_compare0(a)
     '''
 
     def visit_Module(self, node):
         self.compare_functions = list()
-        self.generic_visit(node)
-        node.body.extend(self.compare_functions)
-        self.update |= bool(self.compare_functions)
+        new_body = list()
+        for stmt in node.body:
+            new_stmt = self.visit(stmt)
+            if self.compare_functions:
+                new_body.extend(self.compare_functions)
+                self.update = True
+                self.compare_functions = []
+            new_body.append(new_stmt)
+
+        node.body = new_body
         return node
 
     def visit_FunctionDef(self, node):
