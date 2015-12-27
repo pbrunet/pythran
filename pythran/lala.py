@@ -5,16 +5,10 @@ from pythran.passmanager import Transformation
 from pythran.syntax import PythranSyntaxError
 from pythran.tables import MODULES
 from pythran import metadata as md
+from pythran.metadata import naming
 
 import string
 import ast
-
-def naming():
-    k = 0
-    while True:
-        for a in string.ascii_lowercase:
-            yield ("'"+a+str(k)) if (k > 0) else (a)
-        k = k+1
 
 
 class TypingTest(Transformation):
@@ -174,8 +168,20 @@ class TypingTest(Transformation):
 
     def visit_Call(self, node):
         node.func = self.visit(node.func)
-        print ast.dump(node)
+        node.args = map(self.visit, node.args)
         f_ty = md.get(node.func, md.TType)[0]
+
+        have_vaarg = any(isinstance(t, md.TVaArg) for t in f_ty.args)
+        t_num_arg = len(f_ty.args)
+        r_len_arg = len(node.args)
+
+        if have_vaarg:
+            f_ty = md.replace_vaarg(r_len_arg - t_num_arg + 1, f_ty)
+
+        # prise en compte de la back propagation des types
+        for t_arg, r_arg in zip(f_ty.args, (md.get(arg, md.TType)[0] for arg in node.args)):
+            self.constraints += [(t_arg, r_arg)]
+
         md.add(node, f_ty.ret)
         return node
 
@@ -231,8 +237,11 @@ def unify(c1, c2):
     """
     if isinstance(c1, md.TFun):
         assert isinstance(c2, md.TFun), "Function match only functions"
-        assert len(c1.argtys) == len(c2.argtys)
-        assert False, "See later..."
+        assert len(c1.args) == len(c2.args), (c1, c2)
+        res = unify(c1.ret, c2.ret)
+        for a, b in zip(c1.args, c2.args):
+            res.update(unify(a, b))
+        return res
     elif isinstance(c1, (md.TBool, md.TLong)) and isinstance(c2, (md.TBool, md.TLong)):
         return {} # Simple condition...
     elif isinstance(c1, md.TList) and isinstance(c2, md.TList):
@@ -263,8 +272,10 @@ def apply(s, t):
         return md.TList(apply(s, t.content_type))
     elif isinstance(t, md.TContainer):
         return md.TContainer(apply(s, t.content_type))
+    elif isinstance(t, md.TFun):
+        return md.TFun(apply(s, t.ret), *[apply(s, o) for o in t.args])
     else:
-        assert False, t
+        assert False, (s, t)
 
 def compose(s1, s2):
     s3 = ((t, apply(s1, u)) for t, u in s2.items())
@@ -279,7 +290,7 @@ def solve(xs):
         cs = cs[:-1]
         # Je fais l union des deux types
         s = unify(a, b)
-        print s, a, b
+        print "UNIT? : ", s, a, b
         # Je fusionne tous mes anciens types avec le nouveau
         mgu = compose(s, mgu)
 # propage le unify a la liste de traitement en cours pour travailler ensuite sur

@@ -6,6 +6,14 @@ This module provides a way to pass information between passes as metadata.
 """
 
 from ast import AST  # so that metadata are walkable as regular ast nodes
+import string
+
+def naming():
+    k = 0
+    while True:
+        for a in string.ascii_lowercase:
+            yield ("'"+a+str(k)) if (k > 0) else (a)
+        k = k+1
 
 
 class Metadata(AST):
@@ -43,6 +51,10 @@ class TLong(TType):
 
 class TFloat(TType):
     pass
+
+class TVaArg(TType):
+    def __init__(self, ty=None):
+        self.ty = ty
 
 class TContainer(TType):
     def __init__(self, content):
@@ -87,6 +99,33 @@ class TModule(TType):
 class TIndex(TType):
     "C'est un index"
 
+
+def replace_vaarg(num, t):
+    va_arg = list()
+    for _ in xrange(num):
+        va_arg.append(TVar(naming().next() + "___"))
+    assert isinstance(t, TFun), t
+    def rec(ty):
+        if isinstance(ty, TFun):
+            ty.ret = rec(ty.ret)
+            args = list()
+            for arg in ty.args:
+                if isinstance(arg, TVaArg):
+                    if arg.ty:
+                        args += map(type(arg.ty), va_arg)
+                    else:
+                        args += va_arg
+                else:
+                    args += [rec(arg)]
+            ty.args = args
+            return ty
+        elif isinstance(ty, TVaArg):
+            return va_arg if not ty.ty else map(type(ty.ty), va_arg)
+        elif isinstance(ty, TContainer):
+            return type(ty)(rec(ty.content_type))
+        else:
+            return ty
+    return rec(t)
 
 def add(node, data):
     if not hasattr(node, 'metadata'):
