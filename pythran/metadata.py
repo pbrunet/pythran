@@ -56,25 +56,37 @@ class TVaArg(TType):
     def __init__(self, ty=None):
         self.ty = ty
 
-class TContainer(TType):
-    def __init__(self, content):
+class TIterable(TType):
+    def __init__(self, name, content):
+        self.name = name
         self.content_type = content
 
+class TContainer(TIterable):
     def __str__(self):
         return "TContainer(" + str(self.content_type) + ")"
+
+class TDict(TContainer):
+    def __init__(self, name, key, value):
+        self.key = key
+        super(TDict, self).__init__(name, value)
+
+    def __str__(self):
+        return "TDict(name:" + self.name + " : " + str(self.key) + ", " + str(self.content_type) + ")"
 
 class TArray(TContainer):
     pass
 
-class TTuple(TContainer):
-    pass
+class TTuple(TType):
+    def __init__(self, name, *args):
+        self.name = name
+        self.content_type = args
 
 class TNone(TType):
     pass
 
 class TList(TContainer):
     def __str__(self):
-        return "TList(" + str(self.content_type) + ")"
+        return "TList(" + str(self.content_type) + ", name:" + self.name + ")"
 
 class TVar(TType):
     def __init__(self, value):

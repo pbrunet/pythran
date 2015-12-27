@@ -129,6 +129,26 @@ class TypingTest(Transformation):
         self.env[name] = val_ty
         return node
 
+    def visit_Dict(self, node):
+        keys = map(self.visit, node.keys)
+        if keys:
+            k_ty = md.get(keys[0], md.TType)[0]
+            for k in keys[1:]:
+                self.constraints += [(k_ty, md.get(k , md.TType)[0])]
+        else:
+            k_ty = self.fresh()
+
+        values = map(self.visit, node.values)
+        if values:
+            v_ty = md.get(values[0], md.TType)[0]
+            for v in values[1:]:
+                self.constraints += [(v_ty, md.get(v , md.TType)[0])]
+        else:
+            v_ty = self.fresh()
+
+        md.add(node, md.TDict(self.fresh().type_name, k_ty, v_ty))
+        return node
+
     def visit_AugAssign(self, node):
         node.value = self.visit(node.value)
         val_ty = md.get(node.value, md.TType)[0]
@@ -148,7 +168,11 @@ class TypingTest(Transformation):
                 self.constraints += [(old_ty, elt_ty)]
             old_ty = elt_ty
         old_ty = old_ty or self.fresh()
-        md.add(node, md.TList(old_ty))
+        md.add(node, md.TList(self.fresh().type_name, old_ty))
+        return node
+
+    def visit_Tuple(self, node):
+        md.add(node, md.TTuple(self.fresh().type_name, *[md.get(self.visit(elt), md.TType)[0] for elt in node.elts]))
         return node
 
     def visit_Name(self, node):
@@ -196,7 +220,7 @@ class TypingTest(Transformation):
             self.constraints += [(new_ty, self.env[name])]
         self.env[name] = new_ty
 
-        self.constraints += [(md.TContainer(new_ty), iter_ty)]
+        self.constraints += [(md.TContainer(self.fresh().type_name, new_ty), iter_ty)]
 
         map(self.visit, node.body)
         map(self.visit, node.orelse)
@@ -206,7 +230,7 @@ class TypingTest(Transformation):
         ty = md.get(node.value, md.TType)[0]
         new_ty = self.fresh()
         md.add(node, new_ty)
-        self.constraints += [(md.TContainer(new_ty), ty)]
+        self.constraints += [(md.TContainer(self.fresh().type_name, new_ty), ty)]
         return node
 
     def visit_IfExp(self, node):
@@ -245,6 +269,28 @@ def unify(c1, c2):
     elif isinstance(c1, (md.TBool, md.TLong)) and isinstance(c2, (md.TBool, md.TLong)):
         return {} # Simple condition...
     elif isinstance(c1, md.TList) and isinstance(c2, md.TList):
+        res = unify(c1.content_type, c2.content_type)
+        res.update({c1.name: c2})
+        return res
+    elif isinstance(c1, md.TTuple) and isinstance(c2, md.TTuple):
+        res = {}
+        for arg1, arg2 in zip(c1.content_type, c2.content_type):
+            res.update(unify(arg1, arg2))
+        return res
+    elif isinstance(c1, md.TDict) and isinstance(c2, md.TDict):
+        res = unify(c1.key, c2.key)
+        res.update(unify(c1.content_type, c2.content_type))
+        res.update({c1.name: c2})
+        return res
+    elif isinstance(c1, md.TDict) and isinstance(c2, md.TContainer):
+        res = unify(c1.content_type, c2.content_type)
+        res.update({c2.name: c1})
+        return res
+    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TDict):
+        res = unify(c1.content_type, c2.content_type)
+        res.update({c1.name: c2})
+        return res
+    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TContainer):
         return unify(c1.content_type, c2.content_type)
     elif isinstance(c1, md.TVar):
         return {c1.type_name : c2}
@@ -263,17 +309,30 @@ def union(s1, s2):
 
 def apply(s, t):
     """ s est le nom, t est le type, si le nom correspond, retour un type t
-    equivalent mais sans moins complique."""
+    equivalent mais en moins complique."""
     if isinstance(t, md.TVar):
-        return s.get(t.type_name, t)
+        return s.get(t.type_name, t) or t
     elif isinstance(t, (md.TBool, md.TLong)):
         return t
     elif isinstance(t, md.TList):
-        return md.TList(apply(s, t.content_type))
+        return md.TList(t.name, apply(s, t.content_type))
+    elif isinstance(t, md.TDict):
+        new_t = s.get(t.name, t)
+        new_t.content_type = apply(s, new_t.content_type)
+        new_t.key = apply(s, new_t.key)
+        return new_t
+    elif isinstance(t, md.TTuple):
+        return md.TTuple(t.name, *[apply(s, arg) for arg in t.content_type])
     elif isinstance(t, md.TContainer):
-        return md.TContainer(apply(s, t.content_type))
+        new_t = s.get(t.name, t)
+        new_t.content_type = apply(s, new_t.content_type)
+        return new_t
+    elif isinstance(t, md.TIterable):
+        return md.TIterable(apply(s, t.content_type))
     elif isinstance(t, md.TFun):
         return md.TFun(apply(s, t.ret), *[apply(s, o) for o in t.args])
+    elif t is None:
+        return t
     else:
         assert False, (s, t)
 
@@ -285,12 +344,14 @@ def solve(xs):
     mgu = {}
     cs = list(xs)
     while len(cs):
+#        print "MGU : ", mgu
+#        print ""
         # Je prend la premiere contrainte
         a, b = cs[-1]
         cs = cs[:-1]
         # Je fais l union des deux types
         s = unify(a, b)
-        print "UNIT? : ", s, a, b
+#        print "UNIT? : ", s, a, b
         # Je fusionne tous mes anciens types avec le nouveau
         mgu = compose(s, mgu)
 # propage le unify a la liste de traitement en cours pour travailler ensuite sur
