@@ -5,7 +5,7 @@ from pythran.passmanager import Transformation
 from pythran.syntax import PythranSyntaxError
 from pythran.tables import MODULES
 from pythran import metadata as md
-from pythran.metadata import naming
+from pythran.metadata import T_NAMES
 
 import string
 import ast
@@ -31,7 +31,7 @@ class TypingTest(Transformation):
         self.constraints = []
         self.env = {}
         self.fun_env = {}
-        self.names = naming()
+        self.names = T_NAMES
         Transformation.__init__(self)
 
     def fresh(self):
@@ -39,11 +39,20 @@ class TypingTest(Transformation):
         return md.TVar('$' + next(self.names))
 
     def visit_Return(self, node):
+        if node.value:
+            node.value = self.visit(node.value)
+            ret_ty = md.get(node.value, md.TType)[0]
+            self.constraints += [(ret_ty, self.retty)]
+            self.retty = ret_ty
+        return node
+
+    def visit_Yield(self, node):
         node.value = self.visit(node.value)
-        ret_ty = md.get(node.value, md.TType)[0]
+        ret_ty = md.TIterable(next(self.names), md.get(node.value, md.TType)[0])
         self.constraints += [(ret_ty, self.retty)]
         self.retty = ret_ty
         return node
+
 
     def visit_Num(self, node):
         md.add(node, md.TLong())
@@ -102,7 +111,7 @@ class TypingTest(Transformation):
         # Type de retour
         self.retty = md.TVar("$retty" + node.name)
         # Initialise le type des parametres
-        self.env[node.name] = md.TFun(self.retty, *self.argtys)
+        self.env[node.name] = md.TFun([[self.retty] + self.argtys])
         for (arg, ty) in zip(node.args.args, self.argtys):
             self.env[arg.id] = ty
 
@@ -187,7 +196,7 @@ class TypingTest(Transformation):
             else:
                 assert isinstance(a, ast.Name)
                 return MODULES[a.id]
-        md.add(node, rec(node).type)
+        md.add(node, rec(node).type())
         return node
 
     def visit_Call(self, node):
@@ -195,18 +204,15 @@ class TypingTest(Transformation):
         node.args = map(self.visit, node.args)
         f_ty = md.get(node.func, md.TType)[0]
 
-        have_vaarg = any(isinstance(t, md.TVaArg) for t in f_ty.args)
-        t_num_arg = len(f_ty.args)
-        r_len_arg = len(node.args)
+        f_ty = md.replace_vaarg(node.args, f_ty)
 
-        if have_vaarg:
-            f_ty = md.replace_vaarg(r_len_arg - t_num_arg + 1, f_ty)
+#        # prise en compte de la back propagation des types
+#        for t_arg, r_arg in zip(f_ty.signargs, (md.get(arg, md.TType)[0] for arg in node.args)):
+#            self.constraints += [(t_arg, r_arg)]
+        t = self.fresh()
+        self.constraints += [(md.TFun([[t] + [md.get(arg, md.TType)[0] for arg in node.args]]), f_ty)]
 
-        # prise en compte de la back propagation des types
-        for t_arg, r_arg in zip(f_ty.args, (md.get(arg, md.TType)[0] for arg in node.args)):
-            self.constraints += [(t_arg, r_arg)]
-
-        md.add(node, f_ty.ret)
+        md.add(node, t)
         return node
 
     def visit_For(self, node):
@@ -220,7 +226,7 @@ class TypingTest(Transformation):
             self.constraints += [(new_ty, self.env[name])]
         self.env[name] = new_ty
 
-        self.constraints += [(md.TContainer(self.fresh().type_name, new_ty), iter_ty)]
+        self.constraints += [(md.TIterable(self.fresh().type_name, new_ty), iter_ty)]
 
         map(self.visit, node.body)
         map(self.visit, node.orelse)
@@ -261,11 +267,18 @@ def unify(c1, c2):
     """
     if isinstance(c1, md.TFun):
         assert isinstance(c2, md.TFun), "Function match only functions"
-        assert len(c1.args) == len(c2.args), (c1, c2)
-        res = unify(c1.ret, c2.ret)
-        for a, b in zip(c1.args, c2.args):
-            res.update(unify(a, b))
-        return res
+        possible_sign = list()
+        res = dict()
+        for sig1 in c1.sign:
+            for sig2 in c2.sign:
+                if (len(sig1) == len(sig2) and
+                        all(isinstance(a, type(b)) or isinstance(b, type(a))
+                            for a, b in zip(sig1, sig2))):
+                    possible_sign.append(sig1)
+                    for a, b in zip(sig1, sig2):
+                        res.update(unify(a, b))
+                    return res
+        assert False, "no matching signature"
     elif isinstance(c1, (md.TBool, md.TLong)) and isinstance(c2, (md.TBool, md.TLong)):
         return {} # Simple condition...
     elif isinstance(c1, md.TList) and isinstance(c2, md.TList):
@@ -292,12 +305,22 @@ def unify(c1, c2):
         return res
     elif isinstance(c1, md.TContainer) and isinstance(c2, md.TContainer):
         return unify(c1.content_type, c2.content_type)
+    elif isinstance(c1, md.TList) and isinstance(c2, md.TIterable):
+        res = unify(c1.content_type, c2.content_type)
+        res.update({c2.name: c1})
+        return res
+    elif isinstance(c1, md.TIterable) and isinstance(c2, md.TIterable):
+        res = unify(c1.content_type, c2.content_type)
+        res.update({c2.name: c1})
+        return res
+    elif isinstance(c1, md.TNone) and isinstance(c2, md.TNone):
+        return dict()
     elif isinstance(c1, md.TVar):
         return {c1.type_name : c2}
     elif isinstance(c2, md.TVar):
         return {c2.type_name : c1}
     else:
-        assert False
+        assert False, str(c1) + " " + str(c2)
 
 def union(s1, s2):
     """
@@ -310,9 +333,7 @@ def union(s1, s2):
 def apply(s, t):
     """ s est le nom, t est le type, si le nom correspond, retour un type t
     equivalent mais en moins complique."""
-    if isinstance(t, md.TVar):
-        return s.get(t.type_name, t) or t
-    elif isinstance(t, (md.TBool, md.TLong)):
+    if isinstance(t, (md.TBool, md.TLong, md.TFloat)):
         return t
     elif isinstance(t, md.TList):
         return md.TList(t.name, apply(s, t.content_type))
@@ -328,11 +349,19 @@ def apply(s, t):
         new_t.content_type = apply(s, new_t.content_type)
         return new_t
     elif isinstance(t, md.TIterable):
-        return md.TIterable(apply(s, t.content_type))
+        new_t = s.get(t.name, t)
+        new_t.content_type = apply(s, new_t.content_type)
+        return new_t
     elif isinstance(t, md.TFun):
-        return md.TFun(apply(s, t.ret), *[apply(s, o) for o in t.args])
-    elif t is None:
+        for sig in t.sign:
+            for i in xrange(len(sig)):
+                sig[i] = apply(s, sig[i])
         return t
+#        return md.TFun(apply(s, t.ret), *[apply(s, o) for o in t.args])
+    elif isinstance(t, md.TNone):
+        return t
+    elif isinstance(t, md.TVar):
+        return s.get(t.type_name, t) or t
     else:
         assert False, (s, t)
 

@@ -15,6 +15,11 @@ def naming():
             yield ("'"+a+str(k)) if (k > 0) else (a)
         k = k+1
 
+T_NAMES = naming()
+
+def get_random_name():
+    return next(T_NAMES)
+
 
 class Metadata(AST):
     def __init__(self):
@@ -43,23 +48,36 @@ class Comprehension(AST):
 class TType(AST):
     "Type de base"
 
-class TBool(TType):
+class TVar(TType):
+    def __init__(self, value):
+        super(TVar, self).__init__()
+        self.type_name = value
+
+    def __str__(self):
+        return "TVar(" + self.type_name + ")"
+
+class TLiteral(TVar):
     pass
 
-class TLong(TType):
+class TBool(TLiteral):
     pass
 
-class TFloat(TType):
+class TLong(TLiteral):
+    pass
+
+class TFloat(TLiteral):
     pass
 
 class TVaArg(TType):
     def __init__(self, ty=None):
         self.ty = ty
 
-class TIterable(TType):
+class TIterable(TVar):
     def __init__(self, name, content):
         self.name = name
         self.content_type = content
+    def __str__(self):
+        return "Iterable(name: " + self.name + ", " + str(self.content_type) + ")"
 
 class TContainer(TIterable):
     def __str__(self):
@@ -76,68 +94,103 @@ class TDict(TContainer):
 class TArray(TContainer):
     pass
 
-class TTuple(TType):
+class TTuple(TContainer):
     def __init__(self, name, *args):
         self.name = name
-        self.content_type = args
+        self.content_type = list(args)
 
-class TNone(TType):
-    pass
+    def __str__(self):
+        return "TTuple(" + str([str(a) for a in self.content_type]) + ", name:" + self.name + ")"
+
+class TNone(TVar):
+    def __init__(self):
+        pass
+    def __str__(self):
+        return "TNone"
 
 class TList(TContainer):
     def __str__(self):
         return "TList(" + str(self.content_type) + ", name:" + self.name + ")"
 
-class TVar(TType):
-    def __init__(self, value):
-        super(TVar, self).__init__()
-        self.type_name = value
+class TFun(TVar):
+    def __init__(self, args):
+        self.sign = args;
 
     def __str__(self):
-        return "TVar(" + self.type_name + ")"
+        res = "TFun("
+        for sig in self.sign:
+            res += str([str(a) for a in sig[1:]])
+            res += " -> "
+            res += str(sig[0]) + "OR\n"
+        return res + ")"
 
-class TFun(TType):
-    def __init__(self, ret, *args):
-        self.ret = ret
-        self.args = args
-
-    def __str__(self):
-        return "TFun(" + str([str(a) for a in self.args]) + " -> " + str(self.ret) + ")"
-
-class TModule(TType):
+class TModule(TVar):
     def __init__(self, name):
         self.name = name
+
+    def __str__(self):
+        return "TModule(" + self.name + ")"
 
 class TIndex(TType):
     "C'est un index"
 
 
-def replace_vaarg(num, t):
-    va_arg = list()
-    for _ in xrange(num):
-        va_arg.append(TVar(naming().next() + "___"))
-    assert isinstance(t, TFun), t
-    def rec(ty):
-        if isinstance(ty, TFun):
-            ty.ret = rec(ty.ret)
-            args = list()
-            for arg in ty.args:
-                if isinstance(arg, TVaArg):
-                    if arg.ty:
-                        args += map(type(arg.ty), va_arg)
-                    else:
-                        args += va_arg
-                else:
-                    args += [rec(arg)]
-            ty.args = args
-            return ty
-        elif isinstance(ty, TVaArg):
-            return va_arg if not ty.ty else map(type(ty.ty), va_arg)
-        elif isinstance(ty, TContainer):
-            return type(ty)(rec(ty.content_type))
+def replace_vaarg(args_ty, fun_ty):
+    """
+    args_ty est la liste des arguments utilise,
+    fun_ty est le type de la fonction appelle.
+    """
+    def get_vaarg_len(sign, args):
+        """ -1 means no vaarg found. """
+        arg_sign = sign[1:]  # Ignore return type for now.
+        if len(arg_sign) != len(args_ty):
+            return len(args_ty) - len(arg_sign) + 1
+        elif any(isinstance(t, TVaArg) for t in arg_sign):
+            return 1
         else:
-            return ty
-    return rec(t)
+            return -454554#va_arg_len(arg_sign[for a, b in zip(
+
+    def replace(sign, va_arg):
+        """ sign est une liste. """
+        for i, node in enumerate(sign):
+            if isinstance(node, TFun):
+                for sub_sign in node.sign:
+                    replace(sub_sign, va_arg)
+            elif isinstance(node, TVaArg):
+                """ Si on a un VaArg, on le remplace par la bonne liste et on enleve le vaarg. """
+                assert(i == len(sign) - 1)
+                sign.pop()
+                if node.ty:
+                    sign += [type(node.ty)(next(T_NAMES), arg) for arg in va_arg]
+                else:
+                    sign += va_arg
+                return sign
+            elif isinstance(node, TTuple):
+                # Si on a un Tuple, il peut contenir un VaArg.
+                sign[i] = TTuple(node.name, *[a for a in replace(node.content_type, va_arg)])
+            elif isinstance(node, TIterable):
+                sign[i] = type(node)(next(T_NAMES), replace([node.content_type], va_arg)[0])
+        return sign
+
+    def sign_from_args(sign):
+        """
+        Use sign and args_ty.
+        Return None si la signature ne match pas.
+        """
+        va_arg_len = get_vaarg_len(sign, args_ty)
+        if va_arg_len == -1:
+            return None
+
+        va_arg = [TVar(next(T_NAMES)) for _ in xrange(va_arg_len)]
+
+        return replace(sign, va_arg)
+
+    res = list()
+    for sign in fun_ty.sign:
+        tr_sign = sign_from_args(sign)
+        if tr_sign is not None: # Handle empty signature
+            res.append(tr_sign)
+    return TFun(res)
 
 def add(node, data):
     if not hasattr(node, 'metadata'):

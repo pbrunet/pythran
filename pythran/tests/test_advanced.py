@@ -9,18 +9,18 @@ def dummy_generator(l):
     for i in l: yield i
 def generator_enumeration(begin, end):
     return [i for i in enumerate(dummy_generator(range(begin,end)))]'''
-        self.run_test(code, 2, 10, generator_enumeration=[int, int])
+        self.run_test(code, 2, 10, generator_enumeration=[int, int], OK=None)
 
     def test_augassign_floordiv(self):
         self.run_test("def augassign_floordiv(i,j): k=i ; k//=j; return k",
-                2, 5, augassign_floordiv=[int, int])
+                2, 5, augassign_floordiv=[int, int], OK=None)
 
     def test_builtin_constructors(self):
         self.run_test("def builtin_constructors(l): return map(int,l)",
-                [1.5, 2.5], builtin_constructors=[[float]])
+                [1.5, 2.5], builtin_constructors=[[float]], OK=None)
 
     def test_tuple_sum(self):
-        self.run_test("def tuple_sum(tpl): return sum(tpl)", (1, 2, 3.5), tuple_sum=[(int, int, float)])
+        self.run_test("def tuple_sum(tpl): return sum(tpl)", (1, 2, 3.5), tuple_sum=[(int, int, float)], OK=None)
 
     def test_minus_unary_minus(self):
         self.run_test("def minus_unary_minus(a): return a - -1", 1, minus_unary_minus=[int])
