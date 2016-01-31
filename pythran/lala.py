@@ -55,7 +55,7 @@ class TypingTest(Transformation):
 
 
     def visit_Num(self, node):
-        md.add(node, md.TLong())
+        md.add(node, md.TLong(next(self.names)))
         return node
 
     def visit_Compare(self, node):
@@ -66,7 +66,7 @@ class TypingTest(Transformation):
             comp_ty = md.get(comp, md.TType)[0]
             self.constraints += [(left_ty, comp_ty)]
 
-        md.add(node, md.TBool())
+        md.add(node, md.TBool(next(self.names)))
         return node
 
     def visit_BoolOp(self, node):
@@ -281,10 +281,16 @@ def unify(c1, c2):
         assert False, "no matching signature"
     elif isinstance(c1, (md.TBool, md.TLong)) and isinstance(c2, (md.TBool, md.TLong)):
         return {} # Simple condition...
+    elif isinstance(c1, md.TLong) and isinstance(c2, md.TVar):
+        return {c2.type_name: c1}
+    elif isinstance(c1, md.TFloat) and isinstance(c2, md.TVar):
+        return {c2.type_name: c1}
     elif isinstance(c1, md.TList) and isinstance(c2, md.TList):
         res = unify(c1.content_type, c2.content_type)
         res.update({c1.name: c2})
         return res
+    elif isinstance(c1, md.TNone) and isinstance(c2, md.TNone):
+        return dict()
     elif isinstance(c1, md.TTuple) and isinstance(c2, md.TTuple):
         res = {}
         for arg1, arg2 in zip(c1.content_type, c2.content_type):
@@ -299,22 +305,40 @@ def unify(c1, c2):
         res = unify(c1.content_type, c2.content_type)
         res.update({c2.name: c1})
         return res
-    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TDict):
-        res = unify(c1.content_type, c2.content_type)
-        res.update({c1.name: c2})
-        return res
-    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TContainer):
-        return unify(c1.content_type, c2.content_type)
     elif isinstance(c1, md.TList) and isinstance(c2, md.TIterable):
         res = unify(c1.content_type, c2.content_type)
         res.update({c2.name: c1})
         return res
+    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TDict):
+        res = unify(c1.content_type, c2.content_type)
+        res.update({c1.name: c2})
+        return res
+    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TTuple):
+        res = dict()
+        for ct in c2.content_type:
+            res.update(unify(c1.content_type, ct))
+        res.update({c1.name: c2})
+        return res
+    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TContainer):
+        return unify(c1.content_type, c2.content_type)
+    elif isinstance(c1, md.TContainer) and isinstance(c2, md.TVar):
+        return {c2.type_name: c1}
     elif isinstance(c1, md.TIterable) and isinstance(c2, md.TIterable):
         res = unify(c1.content_type, c2.content_type)
         res.update({c2.name: c1})
         return res
-    elif isinstance(c1, md.TNone) and isinstance(c2, md.TNone):
-        return dict()
+    elif isinstance(c1, md.TIterable) and isinstance(c2, md.TVar):
+        return {c2.type_name : c1}
+    elif isinstance(c1, md.TCombine):
+        res = {}
+        for ty in c1.ty:
+            res.update(unify(ty, c2))
+        return res
+    elif isinstance(c2, md.TCombine):
+        res = {}
+        for ty in c2.ty:
+            res.update(unify(ty, c1))
+        return res
     elif isinstance(c1, md.TVar):
         return {c1.type_name : c2}
     elif isinstance(c2, md.TVar):
@@ -357,9 +381,10 @@ def apply(s, t):
             for i in xrange(len(sig)):
                 sig[i] = apply(s, sig[i])
         return t
-#        return md.TFun(apply(s, t.ret), *[apply(s, o) for o in t.args])
     elif isinstance(t, md.TNone):
         return t
+    elif isinstance(t, md.TCombine):
+        return md.TCombine(t.type_name, *[apply(s, arg) for arg in t.ty])
     elif isinstance(t, md.TVar):
         return s.get(t.type_name, t) or t
     else:

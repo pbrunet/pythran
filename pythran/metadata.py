@@ -60,17 +60,28 @@ class TLiteral(TVar):
     pass
 
 class TBool(TLiteral):
-    pass
+    def __str__(self):
+        return "TBool(" + str(self.type_name) + ")"
 
 class TLong(TLiteral):
-    pass
+    def __str__(self):
+        return "TLong(" + str(self.type_name) + ")"
 
 class TFloat(TLiteral):
-    pass
+    def __str__(self):
+        return "TFloat(" + str(self.type_name) + ")"
 
 class TVaArg(TType):
     def __init__(self, ty=None):
         self.ty = ty
+
+class TCombine(TVar):
+    def __init__(self, name, *ty):
+        super(TCombine, self).__init__(name)
+        self.ty = list(ty)
+
+    def __str__(self):
+        return "Tcombine(" + str([str(a) for a in self.ty]) + ", name:" + self.type_name + ")"
 
 class TIterable(TVar):
     def __init__(self, name, content):
@@ -170,6 +181,8 @@ def replace_vaarg(args_ty, fun_ty):
                 sign[i] = TTuple(node.name, *[a for a in replace(node.content_type, va_arg)])
             elif isinstance(node, TIterable):
                 sign[i] = type(node)(next(T_NAMES), replace([node.content_type], va_arg)[0])
+            elif isinstance(node, TCombine):
+                sign[i] = TCombine(next(T_NAMES), *[a for a in replace(node.ty, va_arg)])
         return sign
 
     def sign_from_args(sign):
