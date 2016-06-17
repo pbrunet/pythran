@@ -29,7 +29,8 @@ class TestEnv(unittest.TestCase):
 
     module = pytest.mark.module
     # default options used for the c++ compiler
-    PYTHRAN_CXX_FLAGS = ['-O0', '-Wall', '-Wno-unknown-pragmas',
+    PYTHRAN_CXX_FLAGS = []
+    ['-O0', '-Wall', '-Wno-unknown-pragmas',
                          '-Wno-mismatched-tags', '-Wno-unused-local-typedefs',
                          '-Wno-unknown-warning-option'] +\
         ([] if sys.platform != "win32" else ["-Werrror"])
