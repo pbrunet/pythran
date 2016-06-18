@@ -11,7 +11,8 @@ namespace pythonic
 
   template <class T>
   struct assignable {
-    using type = T;
+    typedef T type;
+//    using type = T;
   };
 
   template <class T>
