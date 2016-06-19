@@ -11,24 +11,8 @@ namespace pythonic
 
   template <class T>
   struct assignable {
-    typedef T type;
+    typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type type;
 //    using type = T;
-  };
-
-  template <class T>
-  struct assignable<T const> : assignable<T> {
-  };
-
-  template <class T>
-  struct assignable<T const &> : assignable<T> {
-  };
-
-  template <class T>
-  struct assignable<T &> : assignable<T> {
-  };
-
-  template <class T>
-  struct assignable<T &&> : assignable<T> {
   };
 
   template <class T>
@@ -37,18 +21,6 @@ namespace pythonic
 
   template <class T>
   struct returnable : assignable<T> {
-  };
-
-  template <class T>
-  struct returnable<T const &> : assignable<typename returnable<T>::type> {
-  };
-
-  template <class T>
-  struct returnable<T &> : assignable<typename returnable<T>::type> {
-  };
-
-  template <class T>
-  struct returnable<T &&> : assignable<typename returnable<T>::type> {
   };
 }
 
