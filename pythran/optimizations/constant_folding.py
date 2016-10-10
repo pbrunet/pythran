@@ -71,7 +71,6 @@ class ConstantFolding(Transformation):
             try:
                 fake_node = ast.Expression(
                     node.value if isinstance(node, ast.Index) else node)
-                print(ast.dump(fake_node))
                 code = compile(ast.gast_to_ast(fake_node),
                                '<constant folding>', 'eval')
                 value = eval(code, self.env)
