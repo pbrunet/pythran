@@ -44,7 +44,6 @@ UNKNOWN_RANGE = Range(-float("inf"), float("inf"))
 
 def range_values(args):
     """ Function used to compute returned range value of [x]range function. """
-    print("range values: ", args)
     if len(args) == 1:
         return Range(0, args[0].high)
     elif len(args) == 2:
