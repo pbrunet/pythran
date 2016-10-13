@@ -27,7 +27,7 @@ class RangeValues(FunctionAnalysis):
     >>> pm = passmanager.PassManager("test")
     >>> res = pm.gather(RangeValues, node)
     >>> res['c'], res['i']
-    Range(low=0, high=5), Range(low=1, high=10)
+    (Range(low=0, high=5), Range(low=1, high=10))
     """
 
     def __init__(self):
