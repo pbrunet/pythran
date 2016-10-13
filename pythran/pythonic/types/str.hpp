@@ -139,15 +139,33 @@ namespace pythonic
 
     // accessor
     template <class S>
-    char const &sliced_str<S>::operator[](long i) const
+    char const &sliced_str<S>::fast(long i) const
     {
       return (*data)[slicing.get(i)];
     }
 
     template <class S>
-    char &sliced_str<S>::operator[](long i)
+    char &sliced_str<S>::fast(long i)
     {
       return (*data)[slicing.get(i)];
+    }
+
+    template <class S>
+    char const &sliced_str<S>::operator[](long i) const
+    {
+      if (i < 0) {
+        i += size();
+      }
+      return fast(i);
+    }
+
+    template <class S>
+    char &sliced_str<S>::operator[](long i)
+    {
+      if (i < 0) {
+        i += size();
+      }
+      return fast(i);
     }
 
     template <class S>
@@ -518,13 +536,23 @@ namespace pythonic
     {
       if (i < 0)
         i += size();
-      return (*data)[i];
+      return fast(i);
     }
 
     char &str::operator[](long i)
     {
       if (i < 0)
         i += size();
+      return fast(i);
+    }
+
+    char str::fast(long i) const
+    {
+      return (*data)[i];
+    }
+
+    char &str::fast(long i)
+    {
       return (*data)[i];
     }
 
@@ -548,6 +576,15 @@ namespace pythonic
     char &str::operator[](pythran_long_t const &m)
     {
       return (*this)[m.get_si()];
+    }
+    char str::operator[](pythran_long_t const &m) const
+    {
+      return this->fast(m.get_si());
+    }
+
+    char &str::operator[](pythran_long_t const &m)
+    {
+      return this->fast(m.get_si());
     }
 #endif
 
