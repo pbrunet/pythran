@@ -337,7 +337,7 @@ class Types(ModuleAnalysis):
         self.combine(node.target, node.iter, unary_op=IteratorContentType,
                      aliasing_type=True, register=True)
         for n in node.body + node.orelse:
-           self.visit(n)
+            self.visit(n)
 
     def visit_BoolOp(self, node):
         """
@@ -559,7 +559,7 @@ class Types(ModuleAnalysis):
                 self.combine(node.name, node.type, aliasing_type=True,
                              register=True)
         for n in node.body:
-           self.visit(n)
+            self.visit(n)
 
     def visit_Tuple(self, node):
         self.generic_visit(node)
@@ -574,4 +574,4 @@ class Types(ModuleAnalysis):
         for i, arg in enumerate(node.args):
             self.result[arg] = ArgumentType(i)
         for n in node.defaults:
-           self.visit(n)
+            self.visit(n)
