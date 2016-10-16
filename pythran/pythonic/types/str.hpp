@@ -139,7 +139,7 @@ namespace pythonic
 
     // accessor
     template <class S>
-    char const &sliced_str<S>::fast(long i) const
+    char sliced_str<S>::fast(long i) const
     {
       return (*data)[slicing.get(i)];
     }
@@ -151,7 +151,7 @@ namespace pythonic
     }
 
     template <class S>
-    char const &sliced_str<S>::operator[](long i) const
+    char sliced_str<S>::operator[](long i) const
     {
       if (i < 0) {
         i += size();
