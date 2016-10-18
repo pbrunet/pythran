@@ -568,12 +568,12 @@ namespace pythonic
     }
 
 #ifdef USE_GMP
-    char str::operator[](pythran_long_t const &m) const
+    char str::fast(pythran_long_t const &m) const
     {
       return (*this)[m.get_si()];
     }
 
-    char &str::operator[](pythran_long_t const &m)
+    char &str::fast(pythran_long_t const &m)
     {
       return (*this)[m.get_si()];
     }

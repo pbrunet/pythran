@@ -86,7 +86,7 @@ namespace pythonic
       long size() const;
 
       // accessor
-      char const &operator[](long i) const;
+      char operator[](long i) const;
       char &operator[](long i);
       char fast(long i) const;
       char &fast(long i);
