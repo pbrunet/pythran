@@ -14,7 +14,7 @@ class TestDistutils(unittest.TestCase):
                    cwd=os.path.join(cwd, 'test_distutils'))
         check_call(['python', '-c', 'import demo'],
                    cwd=os.path.join(cwd, 'test_distutils', 'demo_install',
-                                    'lib', 'python2.7', 'site-packages'))
+                                    'lib', 'python3.5', 'site-packages'))
         check_call(['python', 'setup.py', 'clean'],
                    cwd=os.path.join(cwd, 'test_distutils'))
         shutil.rmtree(os.path.join(cwd, 'test_distutils', 'demo_install'))
@@ -41,7 +41,7 @@ class TestDistutils(unittest.TestCase):
             for root, dirs, files in os.walk(path):
                 if name in files:
                     return os.path.join(root, name)
-        demo_so = find("demo.so", dist_path)
+        demo_so = find("demo.cpython-35m-x86_64-linux-gnu.so", dist_path)
         self.assertIsNotNone(demo_so)
         shutil.rmtree(dist_path)
 
@@ -52,7 +52,7 @@ class TestDistutils(unittest.TestCase):
                    cwd=os.path.join(cwd, 'test_distutils_packaged'))
         check_call(['python', '-c', 'import demo2.a'],
                    cwd=os.path.join(cwd, 'test_distutils_packaged', 'demo_install2',
-                                    'lib', 'python2.7', 'site-packages'))
+                                    'lib', 'python3.5', 'site-packages'))
         check_call(['python', 'setup.py', 'clean'],
                    cwd=os.path.join(cwd, 'test_distutils_packaged'))
         shutil.rmtree(os.path.join(cwd, 'test_distutils_packaged', 'demo_install2'))
@@ -79,6 +79,6 @@ class TestDistutils(unittest.TestCase):
             for root, dirs, files in os.walk(path):
                 if name in files:
                     return os.path.join(root, name)
-        demo_so = find("a.so", dist_path)
+        demo_so = find("a.cpython-35m-x86_64-linux-gnu.so", dist_path)
         self.assertIsNotNone(demo_so)
         shutil.rmtree(dist_path)
