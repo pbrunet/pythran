@@ -186,7 +186,7 @@ namespace pythonic
       char operator[](long i) const;
       char &operator[](long i);
       char fast(long i) const;
-      char& fast(long i);
+      char &fast(long i);
 
       sliced_str<slice> operator[](slice const &s) const;
       sliced_str<contiguous_slice> operator[](contiguous_slice const &s) const;
