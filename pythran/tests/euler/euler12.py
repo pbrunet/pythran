@@ -43,5 +43,6 @@ def solve(nfact):
         n = i * (i+1) // 2
         print(n, i)
         if num_factors(n) > nfact:
+            print(n)
             return n
             break
