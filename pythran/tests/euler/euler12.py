@@ -31,7 +31,6 @@ def solve(nfact):
         div = 1
         x = 0
         while n > 1:
-            print("w1: ", n)
             c = 1
             while not n % prime(x):
                 c = c + 1
