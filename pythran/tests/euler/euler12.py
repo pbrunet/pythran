@@ -41,7 +41,6 @@ def solve(nfact):
 
     for i in xrange(1, 1000000000):
         n = i * (i+1) // 2
-        print(n, i)
         if num_factors(n) > nfact:
             print(n)
             return n
